@@ -52,7 +52,6 @@ def on_startup():
 # todo: проверка деплой ли
 @app.middleware("http")
 async def emulate_latency(request: Request, call_next):
-    if os.environ["PRODUCTION"] == "true":
-        return
-    await asyncio.sleep(1 + 1 * random.random())
+    if os.environ["PRODUCTION"] != "true":
+        await asyncio.sleep(1 + 1 * random.random())
     return await call_next(request)
