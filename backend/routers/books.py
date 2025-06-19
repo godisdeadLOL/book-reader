@@ -98,7 +98,10 @@ def update(
     if image is not None:
         # Удалить старое
         if book.cover_path is not None:
-            os.remove(f"./covers/{book.cover_path}")
+            try:
+                os.remove(f"./covers/{book.cover_path}")
+            except:
+                pass
 
         # Загрузить новое
         image_file = f"{book.id}.{get_file_ext(image.filename)}"
@@ -127,6 +130,7 @@ def delete(id: int, session: Session = Depends(get_session), access_check=Depend
 
     # Удалить обложку
     if book.cover_path is not None:
-        os.remove(f"./covers/{book.cover_path}")
+        try: os.remove(f"./covers/{book.cover_path}")
+        except: pass
 
     return book
