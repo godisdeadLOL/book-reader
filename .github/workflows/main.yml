@@ -35,3 +35,4 @@ jobs:
           source: "frontend/dist"
           target: "book-reader/frontend/dist"
           strip_components: 2
+          rm: true
