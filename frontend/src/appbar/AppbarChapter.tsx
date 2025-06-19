@@ -2,6 +2,7 @@ import { AppbarBase } from "@/appbar/AppbarBase"
 import { BookTitle } from "@/book/BookTitle"
 import { ChapterDeleteDialogue } from "@/chapter/ChapterDeleteDialogue"
 import { AdaptiveButton } from "@/components/AdaptiveButton"
+import { Title } from "@/components/Title"
 import { ColorModeButton } from "@/components/ui/color-mode"
 import { useCurrentChapterQuery, useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
@@ -34,7 +35,9 @@ export const AppbarChapter = () => {
 
 	const title = (
 		<>
-			<BookTitle />
+			<Title>
+				<BookTitle />
+			</Title>
 			{chaptersData && (
 				<NativeSelect.Root size={"sm"} maxW={64}>
 					<NativeSelect.Field value={chapter_index}>

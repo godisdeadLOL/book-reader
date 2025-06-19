@@ -1,6 +1,6 @@
 import { PendingStatus } from "@/components/PendingStatus"
 import { useCurrentBookQuery, useCurrentChaptersQuery } from "@/hooks/queries"
-import { For, Flex, Mark, Box, Stack, Link, Icon, Separator } from "@chakra-ui/react"
+import { For, Flex, Box, Stack, Link, Icon, Separator, Em } from "@chakra-ui/react"
 import { useEffect, useState } from "preact/hooks"
 import { useNavigate } from "react-router"
 import { DndContext, DragEndEvent } from "@dnd-kit/core"
@@ -47,18 +47,19 @@ const ChapterEntry = ({ data, bookmark = false, disabled = false }: ChapterEntry
 				</Icon>
 			)}
 
-			<Link onClick={() => navigate(data.index.toString())}>
-				Глава {data.index}
-				<Mark color={"GrayText"}>- {data.title}</Mark>
+			<Link display='inline' onClick={() => navigate(data.index.toString())} overflow='hidden' textOverflow='ellipsis' textWrap='nowrap' pr={1}>
+				Глава {data.index} - <Em color={"GrayText"}> {data.title} </Em>
+				{/* <Mark display={{'base' : 'none', 'md' : 'inline'}}>Глава</Mark> {data.index}
+				<Mark color={"GrayText"}>- {data.title}</Mark> */}
 			</Link>
 
 			{bookmark && (
-				<Icon>
+				<Icon ml={-1}>
 					<LuBookmark />
 				</Icon>
 			)}
 
-			<Box ml={"auto"} color={"GrayText"}>
+			<Box ml={"auto"} color={"GrayText"} textWrap={'nowrap'}>
 				{formatTimestamp(data.updated_at)}
 			</Box>
 
@@ -149,7 +150,7 @@ export const ChapterList = () => {
 	}
 
 	return (
-		<DndContext  modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+		<DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
 			<SortableContext items={chapters}>
 				<Stack gap={3} flexDirection={"column-reverse"}>
 					<For each={chapters}>{(item) => <ChapterEntry bookmark={bookmark === item.index} disabled={loading} data={item} key={item.id} />}</For>

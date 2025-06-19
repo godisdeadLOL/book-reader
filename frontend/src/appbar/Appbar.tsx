@@ -1,9 +1,10 @@
 import { AppbarBase } from "@/appbar/AppbarBase"
 import { AdaptiveButton } from "@/components/AdaptiveButton"
+import { Title } from "@/components/Title"
 import { ColorModeButton } from "@/components/ui/color-mode"
 import { useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
-import { IconButton, Box } from "@chakra-ui/react"
+import { IconButton } from "@chakra-ui/react"
 import { LuArrowLeft, LuBookCopy, LuBookPlus, LuBook } from "react-icons/lu"
 import { useLocation, useNavigate } from "react-router"
 
@@ -40,5 +41,5 @@ export const Appbar = ({ title }: any) => {
 		</>
 	)
 
-	return <AppbarBase backButton={backButton} title={<Box>{title}</Box>} controls={controls} />
+	return <AppbarBase backButton={backButton} title={<Title>{title}</Title>} controls={controls} />
 }
