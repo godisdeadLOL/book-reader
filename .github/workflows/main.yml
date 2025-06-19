@@ -34,5 +34,4 @@ jobs:
           port: ${{ secrets.PORT }}
           source: "frontend/dist"
           target: "book-reader/frontend/dist"
-          strip_components: true
-          rm: true
+          strip_components: 2
