@@ -89,7 +89,14 @@ def swap(
     chapters: Sequence[Chapter]
     if index_from < index_to:
         chapters = crud.query_many(
-            session, Chapter, and_(Chapter.index >= index_from, Chapter.index <= index_to), Chapter.index
+            session,
+            Chapter,
+            and_(
+                Chapter.book_id == swap_request.book_id,
+                Chapter.index >= index_from,
+                Chapter.index <= index_to,
+            ),
+            Chapter.index,
         )
 
         chapters[0].index = index_to
@@ -97,7 +104,14 @@ def swap(
             chapters[i].index -= 1
     elif index_from > index_to:
         chapters = crud.query_many(
-            session, Chapter, and_(Chapter.index >= index_to, Chapter.index <= index_from), Chapter.index
+            session,
+            Chapter,
+            and_(
+                Chapter.book_id == swap_request.book_id,
+                Chapter.index >= index_to,
+                Chapter.index <= index_from,
+            ),
+            Chapter.index,
         )
 
         chapters[-1].index = index_to
@@ -133,5 +147,5 @@ def delete(id: int, session: Session = Depends(get_session), access_check=Depend
     session.delete(current_chapter)
     session.add_all(chapters)
     session.commit()
-    
+
     return current_chapter

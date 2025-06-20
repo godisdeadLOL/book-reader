@@ -8,6 +8,7 @@ import { useCurrentChapterQuery, useCurrentParams } from "@/hooks/queries"
 import { CommentList } from "@/comment/CommentList"
 import { CommentCreate } from "@/comment/CommentCreate"
 import { useBookmark } from "@/hooks/useBookmark"
+import { fixDirectSpeech } from "@/utils"
 
 export const ChapterShow = () => {
 	const navigate = useNavigate()
@@ -24,25 +25,31 @@ export const ChapterShow = () => {
 		navigate(`/${book_id}/${index}`)
 	}
 
+	const controls = (
+		<Flex my={8}>
+			<Button onClick={() => navigate(`/${book_id}/${chapterData.index - 1}`)} variant={"ghost"} hidden={chapterData.index === 1}>
+				<LuArrowLeft /> Назад
+			</Button>
+
+			<Button ml="auto" onClick={openNextChapter} variant={"ghost"} hidden={chapterData.index === chapterData.total_amount}>
+				Вперед <LuArrowRight />
+			</Button>
+		</Flex>
+	)
+
 	return (
 		<>
 			<Heading>
 				Глава {chapterData.index} - {chapterData.title}
 			</Heading>
 
-			<Prose maxW={"full"} mt={8}>
-				<Markdown>{chapterData.content}</Markdown>
+			<Prose maxW={"full"} mt={8} textIndent={6} fontSize="md">
+				<Markdown disallowedElements={["li", "ul"]} unwrapDisallowed={true}>
+					{fixDirectSpeech(chapterData.content)}
+				</Markdown>
 			</Prose>
 
-			<Flex my={8}>
-				<Button onClick={() => navigate(`/${book_id}/${chapterData.index - 1}`)} variant={"ghost"} hidden={chapterData.index === 1}>
-					<LuArrowLeft /> Назад
-				</Button>
-
-				<Button ml="auto" onClick={openNextChapter} variant={"ghost"} hidden={chapterData.index === chapterData.total_amount}>
-					Вперед <LuArrowRight />
-				</Button>
-			</Flex>
+			{controls}
 
 			<Heading mb={4}>Комментарии</Heading>
 

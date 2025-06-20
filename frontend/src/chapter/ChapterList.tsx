@@ -118,7 +118,7 @@ export const ChapterList = () => {
 		},
 		onSuccess: () => {
 			toaster.success({ title: "Порядок изменён", duration: import.meta.env.VITE_TOAST_DURATION })
-			refetch()
+			// refetch()
 		},
 		onError: (error) => {
 			toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })

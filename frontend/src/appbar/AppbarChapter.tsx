@@ -6,7 +6,7 @@ import { Title } from "@/components/Title"
 import { ColorModeButton } from "@/components/ui/color-mode"
 import { useCurrentChapterQuery, useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
-import { IconButton, NativeSelect, For } from "@chakra-ui/react"
+import { IconButton, NativeSelect, For, Skeleton } from "@chakra-ui/react"
 import { LuArrowLeft, LuPen, LuTrash } from "react-icons/lu"
 import { useLocation, useNavigate } from "react-router"
 
@@ -38,7 +38,8 @@ export const AppbarChapter = () => {
 			<Title>
 				<BookTitle />
 			</Title>
-			{chaptersData && (
+
+			{chaptersData ? (
 				<NativeSelect.Root size={"sm"} maxW={64}>
 					<NativeSelect.Field value={chapter_index}>
 						<For each={chaptersData}>
@@ -51,6 +52,8 @@ export const AppbarChapter = () => {
 					</NativeSelect.Field>
 					<NativeSelect.Indicator />
 				</NativeSelect.Root>
+			) : (
+				<Skeleton maxW={64} flexGrow={1}>1</Skeleton>
 			)}
 		</>
 	)
@@ -60,7 +63,7 @@ export const AppbarChapter = () => {
 			{token && (
 				<>
 					<ChapterDeleteDialogue data={chapterData} triggerButton={<AdaptiveButton disabled={!chapterData} label="Удалить" colorPalette="red" icon={<LuTrash />} />} />
-					<AdaptiveButton onClick={() => navigate(`/${book_id}/${chapter_index}/chapter_edit`)} label="Редактировать" icon={<LuPen />} />
+					<AdaptiveButton disabled={!chapterData} onClick={() => navigate(`/${book_id}/${chapter_index}/chapter_edit`)} label="Редактировать" icon={<LuPen />} />
 				</>
 			)}
 

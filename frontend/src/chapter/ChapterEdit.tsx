@@ -19,7 +19,7 @@ export const ChapterEdit = () => {
 	const [isLoading, setLoading] = useState(false)
 	const isDisabled = isLoading || isPending
 
-	const {data: book_data} = useCurrentBookQuery()
+	const { data: book_data } = useCurrentBookQuery()
 
 	const token = useToken()
 	const navigate = useNavigate()
@@ -76,23 +76,14 @@ export const ChapterEdit = () => {
 					<Field.Root disabled={isDisabled} required invalid={!!errors.title}>
 						<Field.Label>Название</Field.Label>
 
-						<Input
-							{...register("title", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 100, message: "Максимум 100 символов" } })}
-							placeholder={"Название"}
-						/>
-						<Field.ErrorText> {errors.title} </Field.ErrorText>
+						<Input {...register("title", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" } })} placeholder={"Название"} />
+						<Field.ErrorText> {errors.title?.message} </Field.ErrorText>
 					</Field.Root>
 
 					<Field.Root disabled={isDisabled} required invalid={!!errors.content}>
 						<Field.Label>Содержимое</Field.Label>
-						<Textarea
-							{...register("content", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 1000, message: "Максимум 1000 символов" } })}
-							minH={32}
-							autoresize
-							maxH={48}
-							placeholder={"Содержимое"}
-						/>
-						<Field.ErrorText> {errors.content} </Field.ErrorText>
+						<Textarea {...register("content", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" } })} minH={32} autoresize maxH={48} placeholder={"Содержимое"} />
+						<Field.ErrorText> {errors.content?.message} </Field.ErrorText>
 					</Field.Root>
 
 					<Button disabled={isDisabled} loading={isLoading} w="100%" type={"submit"} mt={8}>

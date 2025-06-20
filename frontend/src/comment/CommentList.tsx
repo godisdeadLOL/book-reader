@@ -1,11 +1,13 @@
 import { CommentDeleteDialogue } from "@/comment/CommentDeleteDialogue"
 import { PendingStatus } from "@/components/PendingStatus"
+import { Prose } from "@/components/ui/prose"
 import { useCurrentCommentsQuery } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { CommentPublic } from "@/schemas"
 import { convertNameToColor, formatTimestamp } from "@/utils"
 import { Box, HStack, Avatar, Stack, For, Text, IconButton } from "@chakra-ui/react"
 import { LuTrash } from "react-icons/lu"
+import Markdown from "react-markdown"
 
 type CommentEntryProps = {
 	data: CommentPublic
@@ -42,7 +44,11 @@ const CommentEntry = ({ data }: CommentEntryProps) => {
 				)}
 			</HStack>
 
-			<Text mt={4}>{data.content}</Text>
+			<Prose maxW={"full"} mt={4}>
+				<Markdown>{data.content}</Markdown>
+			</Prose>
+
+			{/* <Text mt={4}>{data.content}</Text> */}
 		</Box>
 	)
 }

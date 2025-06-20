@@ -48,6 +48,10 @@ export const convertNameToColor = (name : string) => {
 	return colors[total % colors.length]
 }
 
+export const fixDirectSpeech = (text: string) => {
+	return text.replaceAll("\n-", "\n—")
+}
+
 // setBookmark(book_id: number, index: number)
 // getBookmark(book_id: number) -> number
 // clearBookmark(book_id: number)

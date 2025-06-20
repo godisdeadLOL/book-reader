@@ -1,6 +1,6 @@
 import { ChapterTitle } from "@/chapter/ChapterTitle"
 import { toaster } from "@/components/ui/toaster"
-import { useCurrentBookQuery, useCurrentChaptersQuery } from "@/hooks/queries"
+import { useCurrentBookQuery, useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { ChapterPreview, ChapterPublic } from "@/schemas"
 import { handleResponse } from "@/utils"
@@ -18,10 +18,11 @@ export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDial
 	const navigate = useNavigate()
 
 	const { refetch } = useCurrentChaptersQuery()
-	const { data: bookData } = useCurrentBookQuery()
+
+	const { book_id } = useCurrentParams()
 
 	const [isLoading, setIsLoading] = useState(false)
-	const isDisabled = isLoading || !bookData
+	const isDisabled = isLoading
 
 	const queryClient = useQueryClient()
 	const mutation = useMutation({
@@ -39,9 +40,9 @@ export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDial
 		},
 		onSuccess: (result) => {
 			toaster.success({ title: "Глава удалена", duration: import.meta.env.VITE_TOAST_DURATION })
-			navigate(`/${bookData!.id}`)
+			navigate(`/${book_id!}`)
 
-			queryClient.setQueryData(["chapter_list", bookData!.id], (data: any) => data.filter((entry: any) => entry.id != result.id))
+			queryClient.setQueryData(["chapter_list", book_id!], (data: any) => data.filter((entry: any) => entry.id != result.id))
 			refetch()
 		},
 		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),

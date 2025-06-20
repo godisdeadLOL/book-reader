@@ -1,7 +1,7 @@
 import { Image, Center, Mark, Text, Box, Tabs, Badge, For, Wrap } from "@chakra-ui/react"
 import { LuBookOpen, LuBookmarkMinus, LuPen, LuTrash } from "react-icons/lu"
 import { PendingStatus } from "@/components/PendingStatus"
-import { useCurrentBookQuery } from "@/hooks/queries"
+import { useCurrentBookQuery, useCurrentChaptersQuery } from "@/hooks/queries"
 import { ChapterList } from "@/chapter/ChapterList"
 import { AdaptiveButton } from "@/components/AdaptiveButton"
 import { useNavigate } from "react-router"
@@ -30,6 +30,8 @@ export const BookShow = () => {
 
 	const { isPending, error, data: bookData } = useCurrentBookQuery()
 	if (!bookData) return <PendingStatus isPending={isPending} error={error} />
+
+	const { data: chaptersData } = useCurrentChaptersQuery()
 
 	const { bookmark, clearBookmark } = useBookmark(bookData.id)
 
@@ -72,7 +74,7 @@ export const BookShow = () => {
 					<Tabs.Trigger value={"chapters"}>
 						Главы
 						<Mark fontFamily={"mono"} fontSize={"x-small"} mb={-1}>
-							{bookData.chapter_count}
+							{chaptersData ? chaptersData.length : ""}
 						</Mark>
 					</Tabs.Trigger>
 				</Tabs.List>

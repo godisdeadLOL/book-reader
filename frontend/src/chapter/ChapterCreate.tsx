@@ -72,7 +72,7 @@ export const ChapterCreate = () => {
 							{...register("title", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 100, message: "Максимум 100 символов" } })}
 							placeholder={"Название"}
 						/>
-						<Field.ErrorText> {errors.title} </Field.ErrorText>
+						<Field.ErrorText> {errors.title?.message} </Field.ErrorText>
 					</Field.Root>
 
 					<Field.Root disabled={isDisabled} required invalid={!!errors.content}>
@@ -84,7 +84,7 @@ export const ChapterCreate = () => {
 							maxH={48}
 							placeholder={"Содержимое"}
 						/>
-						<Field.ErrorText> {errors.content} </Field.ErrorText>
+						<Field.ErrorText> {errors.content?.message} </Field.ErrorText>
 					</Field.Root>
 
 					<Button disabled={isDisabled} loading={isLoading} w="100%" type={"submit"} mt={8}>
