@@ -9,7 +9,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
-  base: "",
+  base: "/",
   build: {
     outDir: './dist',
     // emptyOutDir: true
