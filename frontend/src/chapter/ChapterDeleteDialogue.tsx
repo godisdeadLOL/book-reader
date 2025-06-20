@@ -1,6 +1,6 @@
 import { ChapterTitle } from "@/chapter/ChapterTitle"
 import { toaster } from "@/components/ui/toaster"
-import { useCurrentBookQuery, useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
+import { useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { ChapterPreview, ChapterPublic } from "@/schemas"
 import { handleResponse } from "@/utils"

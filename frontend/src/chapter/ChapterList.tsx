@@ -86,7 +86,7 @@ export const ChapterList = () => {
 	const { data: book_data } = useCurrentBookQuery()
 	const { bookmark } = useBookmark(book_data!.id)
 
-	const { isPending, error, data: chapters_data, refetch } = useCurrentChaptersQuery()
+	const { isPending, error, data: chapters_data } = useCurrentChaptersQuery()
 	if (!chapters_data) return <PendingStatus isPending={isPending} error={error} />
 
 	const recalculateIndices = (array: any[]) =>
