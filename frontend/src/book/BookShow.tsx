@@ -8,6 +8,8 @@ import { useNavigate } from "react-router"
 import { BookDeleteDialogue } from "@/book/BookDeleteDialogue"
 import { useToken } from "@/hooks/useToken"
 import { useBookmark } from "@/hooks/useBookmark"
+import { Prose } from "@/components/ui/prose"
+import Markdown from "react-markdown"
 
 const Tags = ({ raw }: any) => {
 	const tags = raw.split(",").map((item: string) => item.trim())
@@ -79,9 +81,9 @@ export const BookShow = () => {
 					</Tabs.Trigger>
 				</Tabs.List>
 				<Tabs.Content value={"description"}>
-					<Text fontSize="sm" mb={4}>
-						{bookData.description}
-					</Text>
+					<Prose maxW={"full"} mb={6} mt={-4} textIndent={6} fontSize="sm">
+						<Markdown>{bookData.description}</Markdown>
+					</Prose>
 
 					<Tags raw={bookData.tags} />
 				</Tabs.Content>

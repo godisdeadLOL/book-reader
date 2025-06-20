@@ -60,14 +60,14 @@ const ChapterEntry = ({ data, bookmark = false, disabled = false }: ChapterEntry
 			)}
 
 			<Box ml={"auto"} color={"GrayText"} textWrap={'nowrap'}>
-				{formatTimestamp(data.updated_at)}
+				{formatTimestamp(data.created_at)}
 			</Box>
 
 			{token && (
 				<>
 					<Separator orientation="vertical" alignSelf="stretch" />
 
-					<ChapterDeleteDialogue data={data} triggerButton={<SmallIconButton disabled={disabled} ml={1} icon={<LuTrash />} hoverColor="red" />} />
+					<ChapterDeleteDialogue id={data.id} triggerButton={<SmallIconButton disabled={disabled} ml={1} icon={<LuTrash />} hoverColor="red" />} />
 					<SmallIconButton onClick={() => navigate(`${data.index}/chapter_edit`)} disabled={disabled} ml={2} icon={<LuPen />} />
 				</>
 			)}

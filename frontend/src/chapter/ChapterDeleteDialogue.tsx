@@ -1,8 +1,6 @@
-import { ChapterTitle } from "@/chapter/ChapterTitle"
 import { toaster } from "@/components/ui/toaster"
 import { useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
-import { ChapterPreview, ChapterPublic } from "@/schemas"
 import { handleResponse } from "@/utils"
 import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
@@ -11,9 +9,9 @@ import { useNavigate } from "react-router"
 
 type ChapterDeleteDialogueProps = {
 	triggerButton: any
-	data?: ChapterPublic | ChapterPreview
+	id: number
 }
-export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDialogueProps) => {
+export const ChapterDeleteDialogue = ({ triggerButton, id }: ChapterDeleteDialogueProps) => {
 	const token = useToken()
 	const navigate = useNavigate()
 
@@ -30,7 +28,7 @@ export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDial
 			setIsLoading(true)
 			toaster.info({ title: "Удаление главы...", duration: import.meta.env.VITE_TOAST_DURATION })
 		},
-		mutationFn: (id: number) => {
+		mutationFn: () => {
 			return fetch(`${import.meta.env.VITE_BASE_URL}/chapters/${id}`, {
 				method: "DELETE",
 				headers: {
@@ -60,7 +58,7 @@ export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDial
 					<Dialog.Content>
 						<Dialog.Header>
 							<Dialog.Title>
-								Удаление главы <ChapterTitle data={data} />
+								Удаление главы
 							</Dialog.Title>
 						</Dialog.Header>
 						<Dialog.Body>
@@ -72,7 +70,7 @@ export const ChapterDeleteDialogue = ({ triggerButton, data }: ChapterDeleteDial
 									Отмена
 								</Button>
 							</Dialog.ActionTrigger>
-							<Button loading={isLoading} disabled={isDisabled} colorPalette="red" onClick={() => mutation.mutate(data!.id)}>
+							<Button loading={isLoading} disabled={isDisabled} colorPalette="red" onClick={() => mutation.mutate()}>
 								Удалить
 							</Button>
 						</Dialog.Footer>

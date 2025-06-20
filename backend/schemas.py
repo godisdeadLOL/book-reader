@@ -48,6 +48,7 @@ class ChapterOverview(BaseModel):
     index: int
     title: str
     updated_at: datetime
+    created_at: datetime
 
 
 class ChapterCreate(BaseModel):

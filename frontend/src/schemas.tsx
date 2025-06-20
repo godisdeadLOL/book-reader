@@ -28,6 +28,7 @@ export type ChapterPreview = {
 	index: number
 	title: string
 	updated_at: string
+	created_at: string
 }
 
 export type CommentPublic = {

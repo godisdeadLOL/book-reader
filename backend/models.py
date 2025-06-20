@@ -42,6 +42,9 @@ class Chapter(SQLModel, table=True):
         default_factory=lambda: datetime.now(timezone.utc),
         sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)},
     )
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
 
 class Comment(SQLModel, table=True):
@@ -56,4 +59,7 @@ class Comment(SQLModel, table=True):
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)},
+    )
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
     )

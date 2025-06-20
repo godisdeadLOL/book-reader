@@ -9,9 +9,9 @@ import { useState } from "preact/hooks"
 
 type CommentDeleteDialogueProps = {
 	triggerButton: any
-	data?: CommentPublic
+	id: number
 }
-export const CommentDeleteDialogue = ({ triggerButton, data }: CommentDeleteDialogueProps) => {
+export const CommentDeleteDialogue = ({ triggerButton, id }: CommentDeleteDialogueProps) => {
 	const token = useToken()
 	const { book_id, chapter_index } = useCurrentParams()
 
@@ -24,7 +24,7 @@ export const CommentDeleteDialogue = ({ triggerButton, data }: CommentDeleteDial
 			toaster.info({ title: "Удаление комментария...", duration: import.meta.env.VITE_TOAST_DURATION })
 		},
 		mutationFn: () => {
-			return fetch(`${import.meta.env.VITE_BASE_URL}/comments/${data!.id}`, {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/comments/${id}`, {
 				method: "DELETE",
 				headers: {
 					Token: token ?? "",

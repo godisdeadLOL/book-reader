@@ -34,7 +34,7 @@ const CommentEntry = ({ data }: CommentEntryProps) => {
 
 				{!!token && (
 					<CommentDeleteDialogue
-						data={data}
+						id={data.id}
 						triggerButton={
 							<IconButton ml="auto" rounded="full" size="sm" variant="ghost">
 								<LuTrash />

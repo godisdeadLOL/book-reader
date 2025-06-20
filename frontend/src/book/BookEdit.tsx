@@ -87,25 +87,19 @@ export const BookEdit = () => {
 				<Field.Root disabled={isDisabled} invalid={!!errors.title_original}>
 					<Field.Label>Название (Оригинальное)</Field.Label>
 
-					<Input {...register("title_original", { minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 100, message: "Максимум 100 символов" } })} placeholder={"Название"} />
+					<Input {...register("title_original", { minLength: { value: 3, message: "Минимум 3 символа" } })} placeholder={"Название"} />
 					<Field.ErrorText> {errors.title_original?.message} </Field.ErrorText>
 				</Field.Root>
 
 				<Field.Root disabled={isDisabled} invalid={!!errors.description}>
 					<Field.Label>Описание</Field.Label>
-					<Textarea
-						{...register("description", { minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 1000, message: "Максимум 1000 символов" } })}
-						minH={32}
-						autoresize
-						maxH={48}
-						placeholder={"Описание"}
-					/>
+					<Textarea {...register("description", { minLength: { value: 3, message: "Минимум 3 символа" } })} minH={32} autoresize maxH={48} placeholder={"Описание"} />
 					<Field.ErrorText> {errors.description?.message} </Field.ErrorText>
 				</Field.Root>
 
 				<Field.Root disabled={isDisabled} invalid={!!errors.tags}>
 					<Field.Label>Теги</Field.Label>
-					<Input {...register("tags", { minLength: { value: 3, message: "Минимум 3 символа" }, maxLength: { value: 30, message: "Максимум 30 символов" } })} placeholder={"Теги"} />
+					<Input {...register("tags", { minLength: { value: 3, message: "Минимум 3 символа" } })} placeholder={"Теги"} />
 					<Field.HelperText>Теги должны быть разделены запятыми</Field.HelperText>
 					<Field.ErrorText> {errors.tags?.message} </Field.ErrorText>
 				</Field.Root>
@@ -113,7 +107,7 @@ export const BookEdit = () => {
 				<Field.Root disabled={isDisabled}>
 					<Field.Label>Обложка</Field.Label>
 
-					<FileUpload.Root alignItems="stretch" maxFileSize={1024 * 1024} accept={["image/*"]} onFileAccept={(details) => setFile(details.files[0])}>
+					<FileUpload.Root alignItems="stretch" maxFileSize={2 * 1024 * 1024} accept={["image/*"]} onFileAccept={(details) => setFile(details.files[0])}>
 						<FileUpload.HiddenInput />
 						<FileUpload.Dropzone>
 							<Icon size="md" color="fg.muted">
@@ -125,7 +119,7 @@ export const BookEdit = () => {
 								) : (
 									<>
 										<Box>Перетащите файл сюда</Box>
-										<Box color="fg.muted">Размер до 1 мб</Box>
+										<Box color="fg.muted">Размер до 2 мб</Box>
 									</>
 								)}
 							</FileUpload.DropzoneContent>

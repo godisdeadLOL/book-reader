@@ -1,5 +1,5 @@
 import { Container } from "@chakra-ui/react"
-import { BrowserRouter, Route, Routes } from "react-router"
+import { BrowserRouter, Route, Routes, useLocation } from "react-router"
 import { BookCreate } from "@/book/BookCreate"
 import { BookList } from "@/book/BookList"
 import { BookShow } from "@/book/BookShow"
@@ -12,6 +12,7 @@ import { ChapterEdit } from "@/chapter/ChapterEdit"
 import { Appbar } from "@/appbar/Appbar"
 import { AppbarChapter } from "@/appbar/AppbarChapter"
 import { BookEdit } from "@/book/BookEdit"
+import { useEffect } from "preact/hooks"
 
 const Screen = ({ appbar, content }: any) => {
 	return (
@@ -40,7 +41,23 @@ export const App = () => {
 				<Route path=":book_id/:chapter_index/chapter_edit" element={<Screen appbar={<AppbarChapter />} content={<ChapterEdit />} />} />
 
 				<Route path=":book_id/chapter_create" element={<Screen appbar={<Appbar title="Добавление главы" />} content={<ChapterCreate />} />} />
-				<Route path=":book_id/book_edit" element={<Screen appbar={<Appbar title={<>Редактирование<BookTitle /></>} />} content={<BookEdit />} />} />
+				<Route
+					path=":book_id/book_edit"
+					element={
+						<Screen
+							appbar={
+								<Appbar
+									title={
+										<>
+											Редактирование "<BookTitle />"
+										</>
+									}
+								/>
+							}
+							content={<BookEdit />}
+						/>
+					}
+				/>
 			</Routes>
 		</BrowserRouter>
 	)

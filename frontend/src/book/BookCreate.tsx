@@ -54,7 +54,7 @@ export const BookCreate = () => {
 		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
 		onSettled: () => {
 			setLoading(false)
-		}
+		},
 	})
 
 	const onSubmit = (request: BookCreateRequest) => {
@@ -109,7 +109,7 @@ export const BookCreate = () => {
 				<Field.Root disabled={loading} required>
 					<Field.Label>Обложка</Field.Label>
 
-					<FileUpload.Root alignItems="stretch" maxFileSize={1024 * 1024} accept={["image/*"]} onFileAccept={(details) => setFile(details.files[0])}>
+					<FileUpload.Root alignItems="stretch" maxFileSize={2 * 1024 * 1024} accept={["image/*"]} onFileAccept={(details) => setFile(details.files[0])}>
 						<FileUpload.HiddenInput />
 						<FileUpload.Dropzone>
 							<Icon size="md" color="fg.muted">
@@ -121,7 +121,7 @@ export const BookCreate = () => {
 								) : (
 									<>
 										<Box>Перетащите файл сюда</Box>
-										<Box color="fg.muted">Размер до 1 мб</Box>
+										<Box color="fg.muted">Размер до 2 мб</Box>
 									</>
 								)}
 							</FileUpload.DropzoneContent>

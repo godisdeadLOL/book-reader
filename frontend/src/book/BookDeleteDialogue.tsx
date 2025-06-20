@@ -1,6 +1,6 @@
 import { BookTitle } from "@/book/BookTitle"
 import { toaster } from "@/components/ui/toaster"
-import { useCurrentBookQuery } from "@/hooks/queries"
+import { useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { handleResponse } from "@/utils"
 import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react"
@@ -8,12 +8,17 @@ import { useMutation } from "@tanstack/react-query"
 import { useState } from "preact/hooks"
 import { useNavigate } from "react-router"
 
-export const BookDeleteDialogue = ({ triggerButton }: any) => {
-	const { data: bookData } = useCurrentBookQuery()
+type BookDeleteDialogueProps = {
+	triggerButton: any,
+}
+
+export const BookDeleteDialogue = ({ triggerButton }: BookDeleteDialogueProps) => {
 	const token = useToken()
 
 	const [isLoading, setIsLoading] = useState(false)
-	const isDisabled = isLoading || !bookData
+	const isDisabled = isLoading
+
+	const { book_id } = useCurrentParams()
 
 	const navigate = useNavigate()
 
@@ -23,7 +28,7 @@ export const BookDeleteDialogue = ({ triggerButton }: any) => {
 			toaster.info({ title: "Удаление книги...", duration: import.meta.env.VITE_TOAST_DURATION })
 		},
 		mutationFn: () => {
-			return fetch(`${import.meta.env.VITE_BASE_URL}/books/${bookData!.id}`, {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/books/${book_id}`, {
 				method: "DELETE",
 				headers: {
 					Token: token ?? "",
@@ -49,7 +54,7 @@ export const BookDeleteDialogue = ({ triggerButton }: any) => {
 					<Dialog.Content>
 						<Dialog.Header>
 							<Dialog.Title>
-								Удаление <BookTitle />
+								Удаление "<BookTitle />"
 							</Dialog.Title>
 						</Dialog.Header>
 						<Dialog.Body>
