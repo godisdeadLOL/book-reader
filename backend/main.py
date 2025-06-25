@@ -13,7 +13,7 @@ from routers.books import router as books_router
 from routers.chapters import router as chapters_router
 from routers.comments import router as comments_router
 
-app = FastAPI()
+app = FastAPI(root_path="book-reader")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,12 +35,10 @@ app.include_router(comments_router, prefix="/comments", tags=["Comments"])
 
 app.mount("/covers", StaticFiles(directory="covers"), name="covers")
 
-app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
-
-
-@app.exception_handler(404)
-def redirect_to_index(request: Request, exc):
-    return FileResponse("../frontend/dist/index.html")
+# app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
+# @app.exception_handler(404)
+# def redirect_to_index(request: Request, exc):
+#     return FileResponse("../frontend/dist/index.html")
 
 
 @app.on_event("startup")
