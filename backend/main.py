@@ -13,7 +13,7 @@ from routers.books import router as books_router
 from routers.chapters import router as chapters_router
 from routers.comments import router as comments_router
 
-app = FastAPI(root_path="book-reader")
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
