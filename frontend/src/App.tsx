@@ -29,7 +29,7 @@ export const App = () => {
 	// return <Demo />
 
 	return (
-		<BrowserRouter>
+		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Toaster />
 			<Routes>
 				<Route path="auth" element={<LoginForm />} />
