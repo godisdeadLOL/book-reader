@@ -9,7 +9,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
-  base: "/",
+  base: "/book-reader",
   build: {
     outDir: './dist',
     // emptyOutDir: true
