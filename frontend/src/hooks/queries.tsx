@@ -82,11 +82,11 @@ export const useCurrentChapterQuery = (enabled: boolean = true) => {
 }
 
 export const useCurrentCommentsQuery = () => {
-	const { bookId: book_id, chapterIndex: chapter_index } = useCurrentParams()
+	const { bookId: book_id } = useCurrentParams()
 
 	return useQuery<CommentPublic[]>({
-		queryKey: ["comment_list", book_id, chapter_index],
-		queryFn: () => fetch(`${import.meta.env.VITE_BASE_URL}/comments?book_id=${book_id}&chapter_index=${chapter_index}`).then((res) => handleResponse(res)),
+		queryKey: ["comment_list", book_id],
+		// queryFn: () => fetch(`${import.meta.env.VITE_BASE_URL}/comments?book_id=${book_id}&chapter_index=${chapter_index}`).then((res) => handleResponse(res)),
 	})
 }
 
