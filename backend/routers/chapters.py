@@ -1,61 +1,169 @@
-from operator import index
-from typing import Any, List, Optional, Sequence
-from fastapi import APIRouter, Depends, HTTPException, Response
-from sqlmodel import Session, and_, func, select
+from typing import List, Optional, Sequence
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import and_, false, func, or_, select, true
+from sqlalchemy.orm import Session
 
 import crud
 from db import get_session
 from models import Book, Chapter
-from schemas import ChapterCreate, ChapterOverview, ChapterPublic, ChapterSwap, ChapterUpdate
+from schemas import ChapterCreate, ChapterOverview, ChapterPublic, ChapterReorder, ChapterUpdate
 from security import check_access_token
+from utils import get_chapter_sequence
 
 
 router = APIRouter()
 
 
-@router.get("/", response_model=ChapterPublic)
-def show(book_id: int, chapter_index: int, session: Session = Depends(get_session)):
-    chapter: Optional[Chapter] = crud.query_one(
-        session, Chapter, and_(Chapter.book_id == book_id, Chapter.index == chapter_index)
+@router.get("/query/", response_model=ChapterPublic)
+def query_one(
+    book_id: str, index: int, volume: Optional[int] = None, session: Session = Depends(get_session)
+):
+    entry: Optional[Chapter] = crud.query_one(
+        session, Chapter, and_(Chapter.book_id == book_id, Chapter.volume == volume, Chapter.index == index)
     )
 
-    if not chapter:
+    if not entry:
         raise HTTPException(404)
 
-    chapter_public = ChapterPublic.model_validate(chapter.__dict__, strict=False)
-    chapter_public.total_amount = crud.count(session, Chapter, Chapter.book_id == book_id)
-
-    return chapter_public
+    return entry
 
 
-@router.get("", response_model=list[ChapterOverview])
-def list(book_id: int, session: Session = Depends(get_session)):
-    if not crud.exists(session, Book, book_id):
-        raise HTTPException(404)
-
-    return crud.query_many(session, Chapter, Chapter.book_id == book_id, Chapter.index)
+@router.get("/query", response_model=List[ChapterOverview])
+def query_many(book_id: str, volume: Optional[int] = None, session: Session = Depends(get_session)):
+    return crud.query_many(
+        session,
+        Chapter,
+        and_(Chapter.book_id == book_id, or_(Chapter.volume == volume, true if volume is None else false)),
+        [Chapter.volume, Chapter.index],
+    )
 
 
 @router.post("", response_model=ChapterPublic)
 def create(
     create_request: ChapterCreate,
+    book_id: str,
+    replace: bool = False,
     session: Session = Depends(get_session),
     access_check=Depends(check_access_token),
 ):
     if not access_check:
         raise HTTPException(401)
 
-    if not crud.exists(session, Book, create_request.book_id):
+    if not crud.exists(session, Book, book_id):
         raise HTTPException(404)
 
-    last_index = session.exec(
-        select(func.max(Chapter.index)).where(Chapter.book_id == create_request.book_id)
-    ).one_or_none()
+    # Получить главу с идентичным томом/номером
+    current: Optional[Chapter] = crud.query_one(
+        session,
+        Chapter,
+        and_(
+            Chapter.book_id == book_id,
+            Chapter.volume == create_request.volume,
+            Chapter.index == create_request.index,
+        ),
+    )
 
-    if last_index is None:
-        last_index = 0
+    # Перезапись идентичной главы
+    if current:
+        if not replace:
+            raise HTTPException(400)
+        else:
+            crud.delete(session, Chapter, current.id, commit=False)
 
-    return crud.create(session, Chapter, create_request.model_dump(), index=last_index + 1)
+    # Определить номер главы если он не указан
+    if create_request.index is None:
+        stmt = select(func.max(Chapter.index)).where(
+            and_(Chapter.book_id == book_id, Chapter.volume == create_request.volume)
+        )
+
+        last_index = session.scalar(stmt)
+        create_request.index = (last_index + 1) if last_index is not None else 1
+
+    return crud.create(session, Chapter, create_request.model_dump(), book_id=book_id)
+
+
+@router.post("/reorder/{id}")
+def reorder(
+    id: int,
+    reorder_request: ChapterReorder,
+    session: Session = Depends(get_session),
+    access_check=Depends(check_access_token),
+):
+    # if not access_check:
+    #     raise HTTPException(401)
+
+    current_chapter: Optional[Chapter] = crud.get_one(session, Chapter, id)
+    if not current_chapter:
+        raise HTTPException(404)
+
+    # todo: проверки там всякие на корректность входа
+
+    # Заблокировать все главы книги
+    # todo: протестировать работу блокировки
+    session.execute(select(Chapter).where(Chapter.book_id == current_chapter.book_id).with_for_update())
+    session.refresh(current_chapter)
+
+    # Сдвинуть главы после целевой главы
+    to_chapters: List[Chapter] = crud.query_many(
+        session,
+        Chapter,
+        and_(
+            Chapter.book_id == current_chapter.book_id,
+            Chapter.volume == reorder_request.volume,
+            Chapter.index >= reorder_request.index,
+        ),
+        Chapter.index,
+    )
+    to_chapters = get_chapter_sequence(to_chapters)
+
+    if len(to_chapters) > 0 and to_chapters[0].index == reorder_request.index:
+        for chapter in to_chapters:
+            chapter.index += 1
+
+    session.add_all(to_chapters)
+
+    # Сдвинуть главы после текущей главы
+    from_chapters: List[Chapter] = crud.query_many(
+        session,
+        Chapter,
+        and_(
+            Chapter.book_id == current_chapter.book_id,
+            Chapter.volume == current_chapter.volume,
+            Chapter.index > current_chapter.index,
+        ),
+        Chapter.index,
+    )
+    from_chapters = get_chapter_sequence(from_chapters)
+
+    if len(from_chapters) > 0 and from_chapters[0].index == current_chapter.index + 1:
+        for chapter in from_chapters:
+            chapter.index -= 1
+
+    session.add_all(from_chapters)
+
+    # Изменить номер текущей главы
+    current_chapter.index = reorder_request.index
+    current_chapter.volume = reorder_request.volume
+    session.add(current_chapter)
+
+    session.commit()
+
+    return {"from": from_chapters, "to": to_chapters}
+
+
+@router.get("", response_model=list[ChapterOverview])
+def list(book_id: str, session: Session = Depends(get_session)):
+    return None
+
+
+@router.get("/{id}", response_model=ChapterPublic)
+def show(id: int, session: Session = Depends(get_session)):
+    chapter: Optional[Chapter] = crud.get_one(session, Chapter, id)
+
+    if chapter == None:
+        raise HTTPException(404)
+
+    return chapter
 
 
 @router.put("/{id}", response_model=ChapterPublic)
@@ -68,63 +176,36 @@ def update(
     if not access_check:
         raise HTTPException(401)
 
-    if not crud.exists(session, Chapter, id):
+    chapter: Optional[Chapter] = crud.get_one(session, Chapter, id)
+    if not chapter:
         raise HTTPException(404)
 
-    return crud.update(session, Chapter, id, update_request.model_dump())
+    # Получить главу с идентичным томом/номером
+    current: Optional[Chapter] = crud.query_one(
+        session,
+        Chapter,
+        and_(
+            Chapter.book_id == chapter.book_id,
+            Chapter.id != id,
+            Chapter.volume == update_request.volume,
+            Chapter.index == update_request.index,
+        ),
+    )
+    if current:
+        raise HTTPException(400)
 
-
-@router.post("/swap")
-def swap(
-    swap_request: ChapterSwap,
-    session: Session = Depends(get_session),
-    access_check=Depends(check_access_token),
-):
-    if not access_check:
-        raise HTTPException(401)
-
-    index_from = swap_request.index_from
-    index_to = swap_request.index_to
-
-    chapters: Sequence[Chapter]
-    if index_from < index_to:
-        chapters = crud.query_many(
-            session,
-            Chapter,
-            and_(
-                Chapter.book_id == swap_request.book_id,
-                Chapter.index >= index_from,
-                Chapter.index <= index_to,
-            ),
-            Chapter.index,
-        )
-
-        chapters[0].index = index_to
-        for i in range(1, len(chapters)):
-            chapters[i].index -= 1
-    elif index_from > index_to:
-        chapters = crud.query_many(
-            session,
-            Chapter,
-            and_(
-                Chapter.book_id == swap_request.book_id,
-                Chapter.index >= index_to,
-                Chapter.index <= index_from,
-            ),
-            Chapter.index,
-        )
-
-        chapters[-1].index = index_to
-        for i in range(0, len(chapters) - 1):
-            chapters[i].index += 1
-    else:
-        return
-
-    session.add_all(chapters)
+    chapter = crud.update(session, Chapter, id, update_request.model_dump())
+    
+    # а как пустые поля задавать?
+    if chapter and update_request.volume is None :
+        chapter.volume = None
+    session.add(chapter)
     session.commit()
+    
+    return chapter
 
 
-@router.delete("/{id}", response_model=ChapterPublic)
+@router.delete("/{id}")
 def delete(id: int, session: Session = Depends(get_session), access_check=Depends(check_access_token)):
     if not access_check:
         raise HTTPException(401)
@@ -133,19 +214,23 @@ def delete(id: int, session: Session = Depends(get_session), access_check=Depend
         raise HTTPException(404)
 
     # Обновить порядок
-    current_chapter = crud.get_one(session, Chapter, id)
-    assert type(current_chapter) is Chapter
+    current_chapter: Chapter = crud.get_one(session, Chapter, id)
 
-    chapters: Sequence[Chapter] = crud.query_many(
+    # блокировка всех глав книги
+    session.execute(select(Chapter).where(Chapter.book_id == current_chapter.book_id).with_for_update())
+    session.refresh(current_chapter)
+
+    chapters: List[Chapter] = crud.query_many(
         session,
         Chapter,
         and_(Chapter.book_id == current_chapter.book_id, Chapter.index > current_chapter.index),
     )
-    for chapter in chapters:
-        chapter.index -= 1
+    chapters = get_chapter_sequence(chapters)
+
+    if chapters[0].index == current_chapter.index + 1:
+        for chapter in chapters:
+            chapter.index -= 1
 
     session.delete(current_chapter)
     session.add_all(chapters)
     session.commit()
-
-    return current_chapter

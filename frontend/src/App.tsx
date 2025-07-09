@@ -1,5 +1,5 @@
 import { Container } from "@chakra-ui/react"
-import { BrowserRouter, Route, Routes, useLocation } from "react-router"
+import { BrowserRouter, Route, Routes } from "react-router"
 import { BookCreate } from "@/book/BookCreate"
 import { BookList } from "@/book/BookList"
 import { BookShow } from "@/book/BookShow"
@@ -9,16 +9,16 @@ import { Toaster } from "@/components/ui/toaster"
 import { ChapterShow } from "@/chapter/ChapterShow"
 import { BookTitle } from "@/book/BookTitle"
 import { ChapterEdit } from "@/chapter/ChapterEdit"
-import { Appbar } from "@/appbar/Appbar"
+import { AppbarCatalog } from "@/appbar/AppbarCatalog"
 import { AppbarChapter } from "@/appbar/AppbarChapter"
 import { BookEdit } from "@/book/BookEdit"
-import { useEffect } from "preact/hooks"
+import { Demo } from "@/demos/Demo"
 
 const Screen = ({ appbar, content }: any) => {
 	return (
 		<>
 			{appbar}
-			<Container maxW={"breakpoint-lg"} py={4}>
+			<Container maxW={"breakpoint-md"} py={4}>
 				{content}
 			</Container>
 		</>
@@ -26,38 +26,33 @@ const Screen = ({ appbar, content }: any) => {
 }
 
 export const App = () => {
+	// return <Demo />
+
 	return (
 		<BrowserRouter>
 			<Toaster />
 			<Routes>
 				<Route path="auth" element={<LoginForm />} />
 
-				<Route path="" element={<Screen appbar={<Appbar title="Каталог" />} content={<BookList />} />} />
+				<Route path="" element={<Screen appbar={<AppbarCatalog title="Каталог" />} content={<BookList />} />} />
+				<Route path="book_create" element={<Screen appbar={<AppbarCatalog title="Создание книги" />} content={<BookCreate />} />} />
 
-				<Route path="book_create" element={<Screen appbar={<Appbar title="Создание книги" />} content={<BookCreate />} />} />
+				<Route path=":book_id" element={<Screen appbar={<AppbarCatalog title={<BookTitle />} />} content={<BookShow />} />} />
 
-				<Route path=":book_id" element={<Screen appbar={<Appbar title={<BookTitle />} />} content={<BookShow />} />} />
+				<Route path=":book_id/book_edit" element={<Screen appbar={<AppbarCatalog title={"Редактирование книги"} />} content={<BookEdit />} />} />
+				<Route path=":book_id/chapter_create" element={<Screen appbar={<AppbarCatalog title="Добавление главы" />} content={<ChapterCreate />} />} />
+
+				<Route path=":book_id/:chapter_index/chapter_edit" element={<Screen appbar={<AppbarChapter />} content={<ChapterEdit />} />} />
+				<Route path=":book_id/:chapter_volume/:chapter_index/chapter_edit" element={<Screen appbar={<AppbarChapter />} content={<ChapterEdit />} />} />
+
 				<Route path=":book_id/:chapter_index" element={<Screen appbar={<AppbarChapter />} content={<ChapterShow />} />} />
+				<Route path=":book_id/:chapter_volume/:chapter_index" element={<Screen appbar={<AppbarChapter />} content={<ChapterShow />} />} />
+
+				{/*
 				<Route path=":book_id/:chapter_index/chapter_edit" element={<Screen appbar={<AppbarChapter />} content={<ChapterEdit />} />} />
 
-				<Route path=":book_id/chapter_create" element={<Screen appbar={<Appbar title="Добавление главы" />} content={<ChapterCreate />} />} />
-				<Route
-					path=":book_id/book_edit"
-					element={
-						<Screen
-							appbar={
-								<Appbar
-									title={
-										<>
-											Редактирование "<BookTitle />"
-										</>
-									}
-								/>
-							}
-							content={<BookEdit />}
-						/>
-					}
-				/>
+				
+				<Route path=":book_id/book_edit" element={<Screen appbar={<AppbarCatalog title={<>Редактирование "<BookTitle />"</>} />} content={<BookEdit />} />} /> */}
 			</Routes>
 		</BrowserRouter>
 	)

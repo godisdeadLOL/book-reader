@@ -1,39 +1,68 @@
-export type BookPublic = {
-	id: number
-	title: string
-	title_original: string
-	description: string
-	tags: string
-	cover_path: string
-	chapter_count: number
+import { ChapterReference } from "@/types"
+
+export class BookPublic {
+	public id!: string
+	public title!: string
+	public title_original!: string
+	public description!: string
+	public tags!: string
+	public cover_path!: string
+	public chapter_count!: number
+
+	constructor(obj: Partial<BookPublic>) {
+		Object.assign(this, obj)
+	}
 }
 
-export type BookPreview = {
-	id: number
-	title: string
-	title_original: string
-	cover_path: string
+export class BookPreview {
+	public id!: string
+	public title!: string
+	public title_original!: string
+	public cover_path!: string
+
+	constructor(obj: Partial<BookPreview>) {
+		Object.assign(this, obj)
+	}
 }
 
-export type ChapterPublic = {
-	id: number
-	index: number
-	title: string
-	content: string
-	total_amount: number
-}
+export class ChapterPublic {
+	public id!: number
+	public volume!: number | null
+	public index!: number
+	public title!: string
+	public content!: string
 
-export type ChapterPreview = {
-	id: number
-	index: number
-	title: string
-	updated_at: string
-	created_at: string
-}
+	getChapterReference() {
+		return new ChapterReference(this.volume, this.index)
+	}
 
-export type CommentPublic = {
-	id: number
-	user: string
-	content: string
-	updated_at: string
+	constructor(obj: Partial<ChapterPublic>) {
+		Object.assign(this, obj)
+	}
+}
+export class ChapterPreview {
+	public id!: number
+	public volume!: number | null
+	public index!: number
+	public title!: string
+	public updated_at!: string
+	public created_at!: string
+
+	getReference() {
+		return new ChapterReference(this.volume, this.index)
+	}
+
+	constructor(obj: Partial<ChapterPreview>) {
+		Object.assign(this, obj)
+	}
+}
+export class CommentPublic {
+	public id!: number
+	public user!: string
+	public content!: string
+	public updated_at!: string
+
+	constructor(obj: Partial<CommentPublic>) {
+		Object.assign(this, obj)
+	}
 }

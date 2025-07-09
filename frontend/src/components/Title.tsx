@@ -1,9 +1,10 @@
-import { Box } from "@chakra-ui/react"
+import { Box, chakra, Skeleton } from "@chakra-ui/react"
 
-export const Title = ({ children }: any) => {
-	return (
-		<Box overflow="hidden" textOverflow="ellipsis" textWrap="nowrap">
-			{children}
-		</Box>
-	)
-}
+export const Title = chakra(({ children, ...other }: any) => {
+
+	// if(!children) return <Skeleton>...</Skeleton>
+
+	return <Box overflow="hidden" textOverflow="ellipsis" textWrap="nowrap" {...other}>
+		{children}
+	</Box>
+})

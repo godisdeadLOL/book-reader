@@ -1,45 +1,38 @@
-import { AppbarBase } from "@/appbar/AppbarBase"
-import { AdaptiveButton } from "@/components/AdaptiveButton"
-import { Title } from "@/components/Title"
-import { ColorModeButton } from "@/components/ui/color-mode"
-import { useCurrentParams } from "@/hooks/queries"
-import { useToken } from "@/hooks/useToken"
-import { IconButton } from "@chakra-ui/react"
-import { LuArrowLeft, LuBookCopy, LuBookPlus, LuBook } from "react-icons/lu"
-import { useLocation, useNavigate } from "react-router"
+import { Box, HStack } from "@chakra-ui/react"
+import { useEffect, useRef, useState } from "preact/hooks"
 
-export const Appbar = ({ title }: any) => {
-	const { book_id } = useCurrentParams()
-	const token = useToken()
+type AppbarProps = {
+	hideOnScroll?: boolean
+	children: any
+}
+export const Appbar = ({ hideOnScroll=false, children }: any) => {
+	const [hidden, setHidden] = useState(false)
 
-	const { pathname } = useLocation()
-	let mode: string | null = pathname.split("/").slice(-1)[0]
-	if (["book_create", "book_edit", "chapter_create", "chapter_edit"].indexOf(mode) == -1) mode = null
+	const lastScroll = useRef(0)
 
-	const navigate = useNavigate()
-	const navigateBack = () => {
-		if (!!mode) {
-			if (!!book_id) navigate(`/${book_id}`)
-			else navigate("/")
-		} else {
-			navigate("/")
+	useEffect(() => {
+		if(!hideOnScroll) return
+
+		lastScroll.current = window.scrollY
+
+		const handleScroll = () => {
+			const current = window.scrollY
+			const delta = current - lastScroll.current
+
+			setHidden(current > 64 && delta > 0)
+
+			lastScroll.current = current
 		}
-	}
 
-	const backButton = (!!mode || !!book_id) && (
-		<IconButton onClick={navigateBack} variant={"ghost"} size={"xs"}>
-			<LuArrowLeft />
-		</IconButton>
+		window.addEventListener("scroll", handleScroll)
+		return () => window.removeEventListener("scroll", handleScroll)
+	}, [])
+
+	return (
+		<Box transition="all 0.4s" style={{ translate: hidden ? "0% -100%" : "0% 0%" }} position={"sticky"} backgroundColor={"Background"} zIndex="max" top={0} px={4} h={14} borderBottom={1} borderStyle={"solid"} borderColor={"border"} asChild>
+			<HStack gap={3} >
+				{children}
+			</HStack>
+		</Box>
 	)
-
-	const controls = (
-		<>
-			{!!token && !book_id && <AdaptiveButton onClick={() => navigate(`/book_create`)} label={"Добавить книгу"} icon={<LuBookCopy />} variant="subtle" />}
-			{!!token && !!book_id && <AdaptiveButton onClick={() => navigate(`/${book_id}/chapter_create`)} label={"Добавить главу"} icon={<LuBookPlus />} variant="subtle" />}
-			<AdaptiveButton onClick={() => navigate("/")} colorPalette={"blue"} label={"Каталог"} icon={<LuBook />} variant="solid" />
-			<ColorModeButton />
-		</>
-	)
-
-	return <AppbarBase backButton={backButton} title={<Title>{title}</Title>} controls={controls} />
 }

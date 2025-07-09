@@ -1,15 +1,18 @@
-import { Button, IconButton } from "@chakra-ui/react"
+import { Button, chakra, IconButton } from "@chakra-ui/react"
+import { forwardRef } from "preact/compat"
 
-export const AdaptiveButton = ({ label, icon, onClick = null, variant = "subtle", size="sm", colorPalette = "gray", disabled = false }: any) => {
+const AdaptiveButtonBase = ({ label, icon, ...other }: any) => {
 	return (
 		<>
-			<Button disabled={disabled} onClick={onClick} display={{ base: "none", md: "flex" }} size={size} colorPalette={colorPalette} variant={variant}>
+			<Button display={{ base: "none", md: "flex" }} {...other} >
 				{icon} {label}
 			</Button>
 
-			<IconButton disabled={disabled} onClick={onClick} display={{ md: "none" }} colorPalette={colorPalette} variant={variant}>
+			<IconButton display={{ md: "none" }} {...other}>
 				{icon}
 			</IconButton>
 		</>
 	)
 }
+
+export const AdaptiveButton = chakra(AdaptiveButtonBase)

@@ -14,7 +14,7 @@ type CommentCreateRequest = {
 }
 
 export const CommentCreate = () => {
-	const { book_id, chapter_index } = useCurrentParams()
+	const { bookId: book_id, chapterIndex: chapter_index } = useCurrentParams()
 	const token = useToken()
 
 	const [isLoading, setIsLoading] = useState(false)

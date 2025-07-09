@@ -2,7 +2,7 @@ import { Center, Group, Icon, Spinner, Text } from "@chakra-ui/react"
 import { LuX } from "react-icons/lu"
 
 export const PendingStatus = ({ isPending, error }: any) => (
-	<Center flexGrow={1} py={4} pb={24}>
+	<Center overflowAnchor={"none"} flexGrow={1} py={24}>
 		{isPending && <Spinner size={"lg"} />}
 		{error && (
 			<Group>

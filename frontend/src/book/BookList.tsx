@@ -1,46 +1,54 @@
-import { Box, For, Icon, Image, Wrap } from "@chakra-ui/react"
-import { PendingStatus } from "@/components/PendingStatus"
+import { Box, For, Icon, Image, Skeleton, Wrap } from "@chakra-ui/react"
 import { useNavigate } from "react-router"
 import { useBooksQuery } from "@/hooks/queries"
 import { BookPreview } from "@/schemas"
 import { LuBookmark } from "react-icons/lu"
-import { useBookmark } from "@/hooks/useBookmark"
+import { useBookmarkData } from "@/hooks/useBookmark"
+import { useClearQueries } from "@/hooks/useClearQueries"
+import { useEffect } from "preact/hooks"
 
 type BookEntryProps = {
-	data: BookPreview
+	data?: BookPreview
 }
 const BookEntry = ({ data }: BookEntryProps) => {
 	const navigate = useNavigate()
 
-	const { bookmark } = useBookmark(data.id)
+	const { isBookmarked } = useBookmarkData(data?.id ?? "")
+
+	const Wrapper = ({ children }: any) =>
+		<Box w={{ base: "1/2", sm: "1/3", lg: "1/4" }} onClick={data ? () => navigate(`/${data?.id}`) : undefined}>
+			<Box p={2} pt={4} cursor={"pointer"}>{children}</Box>
+		</Box>
+
+	if (!data) return <Wrapper>
+		<Skeleton w="full" aspectRatio={0.65} />
+		<Skeleton fontSize="xs" mt={2} w="80%">...</Skeleton>
+		<Skeleton fontSize="xx-small" mt={2} w="60%">...</Skeleton>
+	</Wrapper>
 
 	return (
-		<Box w={{ base: "1/2", sm: "1/3", md: "1/4", lg: "1/5" }} onClick={() => navigate(`/${data.id}`)}>
-			<Box p={2} pt={4} cursor={"pointer"}>
-				<Image rounded="sm" w={"100%"} aspectRatio={0.65} src={`${import.meta.env.VITE_BASE_URL}/covers/${data.cover_path}`} />
-				<Box display={"inline-flex"} fontSize="sm" mt={2} fontWeight={"bold"}>
-					{data.title}
-					{bookmark && (
-						<Icon ml={1} mt={1} alignSelf={"center"}>
-							<LuBookmark />
-						</Icon>
-					)}
-				</Box>
-				<Box fontSize="xs" color="GrayText">
-					{data.title_original}
-				</Box>
+		<Wrapper>
+			<Image rounded="sm" w={"100%"} aspectRatio={0.65} objectFit="cover" src={`${import.meta.env.VITE_BASE_URL}/covers/${data.cover_path}`} />
+			<Box display={"inline-flex"} fontSize="sm" mt={2} fontWeight={"bold"}>
+				{data.title}
+				{isBookmarked && (<Icon ml={1} mt={1} alignSelf={"center"}><LuBookmark /></Icon>)}
 			</Box>
-		</Box>
+			<Box fontSize="xs" color="GrayText"> {data.title_original} </Box>
+		</Wrapper>
 	)
 }
 
 export const BookList = () => {
-	const { isPending, error, data: booksData } = useBooksQuery()
-	if (!booksData) return <PendingStatus isPending={isPending} error={error} />
+	const { data: booksData } = useBooksQuery()
+
+	const { clearBookShow } = useClearQueries()
+	useEffect(() => {
+		clearBookShow()
+	}, [])
 
 	return (
 		<Wrap gap={0}>
-			<For each={booksData}>{(item, index) => <BookEntry data={item} key={index} />}</For>
+			<For each={booksData ? booksData : Array(8).fill(null)}>{(item, index) => <BookEntry data={item} key={index} />}</For>
 		</Wrap>
 	)
 }

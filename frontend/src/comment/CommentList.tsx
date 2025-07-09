@@ -5,7 +5,7 @@ import { useCurrentCommentsQuery } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { CommentPublic } from "@/schemas"
 import { convertNameToColor, formatTimestamp } from "@/utils"
-import { Box, HStack, Avatar, Stack, For, Text, IconButton } from "@chakra-ui/react"
+import { Box, HStack, Avatar, Stack, For, Text, IconButton, Skeleton, SkeletonText } from "@chakra-ui/react"
 import { LuTrash } from "react-icons/lu"
 import Markdown from "react-markdown"
 
@@ -18,7 +18,7 @@ const CommentEntry = ({ data }: CommentEntryProps) => {
 	return (
 		<Box fontSize={"sm"}>
 			<HStack gap={4}>
-				<Avatar.Root colorPalette={convertNameToColor(data.user)}>
+				<Avatar.Root shape={"rounded"} size="xs" colorPalette={convertNameToColor(data.user)}>
 					<Avatar.Fallback name={data.user} />
 				</Avatar.Root>
 
@@ -32,35 +32,46 @@ const CommentEntry = ({ data }: CommentEntryProps) => {
 					</Text>
 				</Stack>
 
-				{!!token && (
-					<CommentDeleteDialogue
-						id={data.id}
-						triggerButton={
-							<IconButton ml="auto" rounded="full" size="sm" variant="ghost">
-								<LuTrash />
-							</IconButton>
-						}
-					/>
-				)}
+				{/* {!!token && (
+					<CommentDeleteDialogue id={data.id} triggerButton={<IconButton ml="auto" rounded="full" size="sm" variant="ghost"> <LuTrash /> </IconButton>} />
+				)} */}
 			</HStack>
 
-			<Prose maxW={"full"} mt={4}>
+			<Prose maxW={"full"} pt={2}>
 				<Markdown>{data.content}</Markdown>
 			</Prose>
-
-			{/* <Text mt={4}>{data.content}</Text> */}
 		</Box>
 	)
 }
 
-export const CommentList = () => {
-	const { isPending, error, data: commentsData } = useCurrentCommentsQuery()
+const CommentSkeleton = () => {
+	return <Box>
+		<HStack gap={4} alignItems="start" pb={4}>
+			<Skeleton w={8} h={8} />
 
-	if (!commentsData) return <PendingStatus isPending={isPending} error={error} />
+			<Stack gap={1} justifyContent="start">
+				<Skeleton w={32} h={4} />
+				<Skeleton w={24} h={3} />
+			</Stack>
+		</HStack>
+
+		<SkeletonText noOfLines={2} />
+	</Box>
+}
+
+export const CommentList = () => {
+	const { data: commentsData } = useCurrentCommentsQuery()
+
+	console.log("rerender")
 
 	return (
-		<Stack gap={8} my={12}>
-			<For each={commentsData}>{(item, index) => <CommentEntry key={index} data={item} />}</For>
+		<Stack gap={8} mt={8}>
+
+			{commentsData ?
+				<For each={commentsData}>{(item, index) => <CommentEntry key={index} data={item} />}</For> :
+				Array(5).fill(undefined).map((_) => <CommentSkeleton />)
+			}
+
 		</Stack>
 	)
 }

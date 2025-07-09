@@ -1,43 +1,34 @@
 import { Button, Field, Heading, Input, Stack, Textarea } from "@chakra-ui/react"
 import { useForm } from "react-hook-form"
 import { LuPen } from "react-icons/lu"
-import { useCurrentBookQuery, useCurrentChapterQuery } from "@/hooks/queries"
-import { useMutation } from "@tanstack/react-query"
+import { useCurrentBookQuery, useCurrentChapterQuery, useCurrentParams } from "@/hooks/queries"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toaster } from "@/components/ui/toaster"
 import { handleResponse } from "@/utils"
 import { useEffect, useState } from "preact/hooks"
 import { useToken } from "@/hooks/useToken"
 import { useNavigate } from "react-router"
-
-type ChapterEditRequest = {
-	title: string
-	content: string
-}
+import { ChapterForm, ChapterFormFields } from "@/chapter/ChapterForm"
+import { useNavigateChapter } from "@/hooks/useNavigateChapter"
+import { ChapterPublic } from "@/schemas"
+import { ChapterReference } from "@/types"
+import { useClearQueries } from "@/hooks/useClearQueries"
 
 export const ChapterEdit = () => {
-	const { data: chapterData, isPending } = useCurrentChapterQuery()
-	const [isLoading, setLoading] = useState(false)
-	const isDisabled = isLoading || isPending
-
-	const { data: book_data } = useCurrentBookQuery()
+	const { bookId } = useCurrentParams()
+	const { data: chapterData } = useCurrentChapterQuery()
 
 	const token = useToken()
-	const navigate = useNavigate()
+	const { navigate } = useNavigateChapter()
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		setValue,
-	} = useForm<ChapterEditRequest>()
+	const { clearChapterList } = useClearQueries()
 
 	const mutation = useMutation({
 		onMutate: () => {
-			toaster.info({ title: "Изменение главы...", duration: import.meta.env.VITE_TOAST_DURATION })
-			setLoading(true)
+			toaster.info({ title: "Обновление главы...", duration: import.meta.env.VITE_TOAST_DURATION })
 		},
-		mutationFn: (request: any) => {
-			return fetch(`${import.meta.env.VITE_BASE_URL}/chapters/${chapterData!.id}`, {
+		mutationFn: ({ chapterId, request }: { chapterId: number, request: ChapterFormFields }) => {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/chapters/${chapterId}`, {
 				method: "PUT",
 				body: JSON.stringify(request),
 				headers: {
@@ -46,51 +37,21 @@ export const ChapterEdit = () => {
 				},
 			}).then((res) => handleResponse(res))
 		},
-		onSuccess: () => {
-			toaster.success({ title: "Глава создана", duration: import.meta.env.VITE_TOAST_DURATION })
-			navigate(`/${book_data!.id}/${chapterData!.index}`)
+		onSuccess: (chapter: ChapterPublic) => {
+			toaster.success({ title: "Глава обновлена", duration: import.meta.env.VITE_TOAST_DURATION })
+
+			clearChapterList()
+			navigate(new ChapterReference(chapter.volume, chapter.index))
+
 		},
 		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
-		onSettled: () => {
-			setLoading(false)
-		},
 	})
 
-	const onSubmit = (request: ChapterEditRequest) => {
-		mutation.mutate(request)
+	const onSubmit = (request: ChapterFormFields) => {
+		mutation.mutate({ chapterId: chapterData?.id!, request: request })
 	}
 
-	useEffect(() => {
-		if (!chapterData) return
-
-		setValue("title", chapterData.title)
-		setValue("content", chapterData.content)
-	}, [chapterData])
-
-	return (
-		<>
-			<Heading mb={8}>Редактирование главы</Heading>
-
-			<Stack gap={4} asChild>
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<Field.Root disabled={isDisabled} required invalid={!!errors.title}>
-						<Field.Label>Название</Field.Label>
-
-						<Input {...register("title", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" } })} placeholder={"Название"} />
-						<Field.ErrorText> {errors.title?.message} </Field.ErrorText>
-					</Field.Root>
-
-					<Field.Root disabled={isDisabled} required invalid={!!errors.content}>
-						<Field.Label>Содержимое</Field.Label>
-						<Textarea {...register("content", { required: "Поле обязательно", minLength: { value: 3, message: "Минимум 3 символа" } })} minH={32} autoresize maxH={48} placeholder={"Содержимое"} />
-						<Field.ErrorText> {errors.content?.message} </Field.ErrorText>
-					</Field.Root>
-
-					<Button disabled={isDisabled} loading={isLoading} w="100%" type={"submit"} mt={8}>
-						<LuPen /> Применить
-					</Button>
-				</form>
-			</Stack>
-		</>
-	)
+	return <ChapterForm onSubmit={onSubmit} disabled={!chapterData} loading={mutation.isPending} chapterData={chapterData}>
+		<LuPen /> Применить
+	</ChapterForm>
 }

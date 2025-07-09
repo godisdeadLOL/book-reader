@@ -1,65 +1,57 @@
-from typing import Optional
-from sqlmodel import Field, Relationship, SQLModel
-
 from datetime import datetime, timezone
+from typing import Optional
+from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Book(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    title: str
-    title_original: str
-    description: str
-    tags: str
+class Base(DeclarativeBase):
+    created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    cover_path: Optional[str]
 
-    chapters: list["Chapter"] = Relationship(back_populates="book", cascade_delete=True)
+class Book(Base):
+    __tablename__ = "book"
 
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)},
-    )
+    id: Mapped[str] = mapped_column(primary_key=True)
+
+    title: Mapped[str]
+    title_original: Mapped[str]
+    description: Mapped[str]
+    tags: Mapped[str]
+
+    cover_path: Mapped[Optional[str]]
+
+    chapters: Mapped[list["Chapter"]] = relationship(back_populates="book", cascade="all, delete")
 
     @property
     def chapter_count(self):
         return len(self.chapters)
 
 
-class Chapter(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Chapter(Base):
+    __tablename__ = "chapter"
 
-    title: str
-    content: str
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    index: int
+    volume: Mapped[Optional[int]] = mapped_column(default=None)
+    index: Mapped[int]
+    
+    title: Mapped[str]
+    content: Mapped[str]
 
-    book_id: int = Field(foreign_key="book.id")
-    book: Book = Relationship(back_populates="chapters")
+    book_id: Mapped[str] = mapped_column(ForeignKey("book.id"))
+    book: Mapped["Book"] = relationship(back_populates="chapters")
 
-    comments: list["Comment"] = Relationship(back_populates="chapter", cascade_delete=True)
-
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)},
-    )
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    comments: Mapped[list["Comment"]] = relationship(back_populates="chapter", cascade="all, delete")
 
 
-class Comment(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Comment(Base):
+    __tablename__ = "comment"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    user: str
-    content: str
+    user: Mapped[str]
+    content: Mapped[str]
 
-    chapter_id: int = Field(foreign_key="chapter.id")
-    chapter: Chapter = Relationship(back_populates="comments")
-
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)},
-    )
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id"))
+    chapter: Mapped[Chapter] = relationship(back_populates="comments")

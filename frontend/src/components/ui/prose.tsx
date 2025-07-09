@@ -12,6 +12,9 @@ export const Prose = chakra("div", {
       marginTop: "1em",
       marginBottom: "1em",
     },
+    "& p:first-of-type" : {
+      mt: 0
+    },
     "& blockquote": {
       marginTop: "1.285em",
       marginBottom: "1.285em",

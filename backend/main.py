@@ -4,14 +4,13 @@ import random
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from db import init_db
 
 from routers.books import router as books_router
 from routers.chapters import router as chapters_router
-from routers.comments import router as comments_router
+# from routers.comments import router as comments_router
 
 app = FastAPI()
 app.add_middleware(
@@ -23,15 +22,9 @@ app.add_middleware(
     expose_headers=["X-Total-Count"],
 )
 
-
-@app.get("/test")
-def test_endpoint():
-    return "test indeed"
-
-
 app.include_router(books_router, prefix="/books", tags=["Books"])
 app.include_router(chapters_router, prefix="/chapters", tags=["Chapters"])
-app.include_router(comments_router, prefix="/comments", tags=["Comments"])
+# app.include_router(comments_router, prefix="/comments", tags=["Comments"])
 
 app.mount("/covers", StaticFiles(directory="covers"), name="covers")
 

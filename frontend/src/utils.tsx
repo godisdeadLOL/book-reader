@@ -59,6 +59,25 @@ export const fixDirectSpeech = (text: string) => {
 	return text.replaceAll("\n-", "\n—")
 }
 
-// setBookmark(book_id: number, index: number)
-// getBookmark(book_id: number) -> number
-// clearBookmark(book_id: number)
+export const parseValue = (value: string | undefined) => {
+	const parsed = parseInt(value ?? "")
+	if (isNaN(parsed)) return undefined
+	return parsed
+}
+
+export const checkEqualShallow = (a: any, b: any) => {
+	if (!a && !b) return true
+	if (!a || !b) return false
+
+	for (var key in a) {
+		if (!(key in b) || a[key] !== b[key]) {
+			return false;
+		}
+	}
+	for (var key in b) {
+		if (!(key in a) || a[key] !== b[key]) {
+			return false;
+		}
+	}
+	return true;
+}

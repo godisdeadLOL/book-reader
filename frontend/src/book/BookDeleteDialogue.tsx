@@ -1,38 +1,25 @@
-import { BookTitle } from "@/book/BookTitle"
+import { ActionDialogue } from "@/components/ActionDialogue"
 import { toaster } from "@/components/ui/toaster"
 import { useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
 import { handleResponse } from "@/utils"
-import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import { useMutation } from "@tanstack/react-query"
-import { useState } from "preact/hooks"
 import { useNavigate } from "react-router"
 
-type BookDeleteDialogueProps = {
-	triggerButton: any,
-}
 
-export const BookDeleteDialogue = ({ triggerButton }: BookDeleteDialogueProps) => {
+export const BookDeleteDialogue = ({children} : any) => {
 	const token = useToken()
-
-	const [isLoading, setIsLoading] = useState(false)
-	const isDisabled = isLoading
-
-	const { book_id } = useCurrentParams()
+	const { bookId } = useCurrentParams()
 
 	const navigate = useNavigate()
-
 	const mutation = useMutation({
 		onMutate: () => {
-			setIsLoading(true)
 			toaster.info({ title: "Удаление книги...", duration: import.meta.env.VITE_TOAST_DURATION })
 		},
 		mutationFn: () => {
-			return fetch(`${import.meta.env.VITE_BASE_URL}/books/${book_id}`, {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/books/${bookId}`, {
 				method: "DELETE",
-				headers: {
-					Token: token ?? "",
-				},
+				headers: { Token: token ?? "" }
 			}).then((res) => handleResponse(res))
 		},
 		onSuccess: () => {
@@ -40,42 +27,9 @@ export const BookDeleteDialogue = ({ triggerButton }: BookDeleteDialogueProps) =
 			navigate("/")
 		},
 		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
-		onSettled: () => {
-			setIsLoading(false)
-		},
 	})
 
 	return (
-		<Dialog.Root>
-			<Dialog.Trigger asChild>{triggerButton}</Dialog.Trigger>
-			<Portal>
-				<Dialog.Backdrop />
-				<Dialog.Positioner>
-					<Dialog.Content>
-						<Dialog.Header>
-							<Dialog.Title>
-								Удаление "<BookTitle />"
-							</Dialog.Title>
-						</Dialog.Header>
-						<Dialog.Body>
-							<p>Вы точно хотите удалить эту книгу?</p>
-						</Dialog.Body>
-						<Dialog.Footer>
-							<Dialog.ActionTrigger asChild>
-								<Button disabled={isDisabled} variant="outline">
-									Отмена
-								</Button>
-							</Dialog.ActionTrigger>
-							<Button disabled={isDisabled} loading={isLoading} colorPalette="red" onClick={() => mutation.mutate()}>
-								Удалить
-							</Button>
-						</Dialog.Footer>
-						<Dialog.CloseTrigger asChild>
-							<CloseButton size="sm" disabled={isDisabled} />
-						</Dialog.CloseTrigger>
-					</Dialog.Content>
-				</Dialog.Positioner>
-			</Portal>
-		</Dialog.Root>
+		<ActionDialogue title="Удаление книги" description="Вы точно хотите удалить эту книгу?" promise={() => mutation.mutateAsync()}>{children}</ActionDialogue>
 	)
 }
