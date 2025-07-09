@@ -4,9 +4,9 @@
 		<meta charset="UTF-8" />
 		<title>Redirecting...</title>
 		<script>
-			const redirectTo = "/" + location.pathname + location.search + location.hash
-			sessionStorage.redirect = redirectTo
-			window.location.href = "/"
+			const redirect = location.pathname + location.search + location.hash
+			sessionStorage.setItem("redirect", redirect)
+			window.location.href = "/book-reader/"
 		</script>
 	</head>
 	<body>
