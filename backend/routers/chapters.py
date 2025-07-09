@@ -195,13 +195,13 @@ def update(
         raise HTTPException(400)
 
     chapter = crud.update(session, Chapter, id, update_request.model_dump())
-    
+
     # а как пустые поля задавать?
-    if chapter and update_request.volume is None :
+    if chapter and update_request.volume is None:
         chapter.volume = None
     session.add(chapter)
     session.commit()
-    
+
     return chapter
 
 
@@ -223,7 +223,11 @@ def delete(id: int, session: Session = Depends(get_session), access_check=Depend
     chapters: List[Chapter] = crud.query_many(
         session,
         Chapter,
-        and_(Chapter.book_id == current_chapter.book_id, Chapter.index > current_chapter.index),
+        and_(
+            Chapter.book_id == current_chapter.book_id,
+            Chapter.volume == current_chapter.volume,
+            Chapter.index > current_chapter.index,
+        ),
     )
     chapters = get_chapter_sequence(chapters)
 

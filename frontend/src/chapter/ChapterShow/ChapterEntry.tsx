@@ -58,7 +58,7 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
             p: ({ node, ...other }: any) => <Paragraph index={node.properties!.index} context={chapterContext} {...other} />
         }
 
-        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh">
+        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh" overflowAnchor="none">
             <Heading display="flex" alignItems="center" gap={1}>
                 Глава {chapterData.index} - {chapterData.title}
                 {(checkEqualShallow(chapterReference, passiveBookmark)) && <LuBookmark />}
