@@ -89,8 +89,8 @@ def reorder(
     session: Session = Depends(get_session),
     access_check=Depends(check_access_token),
 ):
-    # if not access_check:
-    #     raise HTTPException(401)
+    if not access_check:
+        raise HTTPException(401)
 
     current_chapter: Optional[Chapter] = crud.get_one(session, Chapter, id)
     if not current_chapter:
