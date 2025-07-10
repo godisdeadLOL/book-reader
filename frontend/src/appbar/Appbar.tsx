@@ -29,7 +29,7 @@ export const Appbar = ({ hideOnScroll=false, children }: any) => {
 	}, [])
 
 	return (
-		<Box transition="all 0.4s" style={{ translate: hidden ? "0% -100%" : "0% 0%" }} position={"sticky"} backgroundColor={"Background"} zIndex="max" top={0} px={4} h={14} borderBottom={1} borderStyle={"solid"} borderColor={"border"} asChild>
+		<Box transition="all 0.4s" style={{ translate: hidden ? "0% -100%" : "0% 0%" }} position={"sticky"} backgroundColor={"Background"} zIndex="max" top={0} px={4} h={14} borderBottom={1} borderStyle={"solid"} borderColor={"border"} asChild overflowAnchor="none">
 			<HStack gap={3} >
 				{children}
 			</HStack>

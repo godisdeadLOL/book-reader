@@ -1,3 +1,5 @@
+import "preact/debug"
+
 import { render } from "preact"
 import { App } from "@/App"
 import { Provider } from "@/components/ui/provider"
