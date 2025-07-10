@@ -42,7 +42,7 @@ export const Paragraph = ({ index, context, children }: ParagraphProps) => {
     }
 
     return <>
-        {(isSelected || isBookmarked) && <Box position="relative" h={0}>
+        {(isSelected || isBookmarked) && <Box position="relative" h={0} overflowAnchor="none">
             {isBookmarked && <Box position="absolute" color="red.400" top={3}> <LuBookmark /> </Box>}
 
             {isSelected && <HStack gap={0} position="absolute" left={-2} top={2} px={3} py={2} bg="InfoBackground" borderWidth={1} borderColor="border" rounded="md" textIndent={0}>

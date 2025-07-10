@@ -12,7 +12,6 @@ import { useClearQueries } from "@/hooks/useClearQueries"
 export const ChapterShow = () => {
     const bookmarkApplied = useRef(false)
     const trackedChapterElement = useRef<HTMLElement | null>(null)
-    const relativeScroll = useRef<number | null>(null)
 
     const { data: chaptersData } = useCurrentChaptersQuery()
     if (!chaptersData) return <ChapterSkeleton />
@@ -71,11 +70,6 @@ export const ChapterShow = () => {
     useEffect(() => {
         tryGetCurrentChapterElement()
 
-        if (trackedChapterElement.current && relativeScroll.current) {
-            window.scrollY = trackedChapterElement.current.getBoundingClientRect().top + window.scrollY + relativeScroll.current
-            relativeScroll.current = null
-        }
-
         const onScroll = () => {
             if (!trackedChapterElement.current) return
 
@@ -100,11 +94,6 @@ export const ChapterShow = () => {
             // Выгрузка предыдущей главы
             if (scrollFrom > 1.0 && nextIndex) {
                 setDisplayParams({ current: nextIndex, next: false })
-
-                const nextElement = document.getElementById(`chapter-${chaptersData[nextIndex].id}`)
-                if (nextElement) {
-                    relativeScroll.current = -nextElement?.getBoundingClientRect().top
-                }
             }
 
             // Подгрузка следующей главы

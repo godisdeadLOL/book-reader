@@ -20,7 +20,8 @@ const style : SystemStyleObject = {
         px: 4,
         py: 2,
         md: { rounded: "md" },
-        _selected: { bg: "bg.emphasized" }
+        _selected: { bg: "bg.emphasized" },
+        overflowAnchor: "none"
     }
 }
 
@@ -58,8 +59,7 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
             p: ({ node, ...other }: any) => <Paragraph index={node.properties!.index} context={chapterContext} {...other} />
         }
 
-        // overflowAnchor="none"
-        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh" overflowAnchor="none"> 
+        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh"> 
             <Heading display="flex" alignItems="center" gap={1}>
                 {chapterData.getChapterReference().getRepr()} - {chapterData.title}
                 {(checkEqualShallow(chapterReference, passiveBookmark)) && <LuBookmark />}
