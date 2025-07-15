@@ -1,8 +1,9 @@
 import { toaster } from "@/components/ui/toaster"
-import { useCurrentParams } from "@/hooks/queries"
+import { useCurrentChapterQuery, useCurrentParams } from "@/hooks/queries"
 import { useToken } from "@/hooks/useToken"
+import { CommentPublic } from "@/schemas"
 import { handleResponse } from "@/utils"
-import { Stack, Input, Textarea, Button, Field } from "@chakra-ui/react"
+import { Stack, Field, Input, Textarea, Button, Wrap } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "preact/hooks"
 import ReCAPTCHA from "react-google-recaptcha"
@@ -14,76 +15,82 @@ type CommentCreateRequest = {
 }
 
 export const CommentCreate = () => {
-	const { bookId: bookid } = useCurrentParams()
+	const { data: chapterData } = useCurrentChapterQuery(false)
+	if (!chapterData) return <></>
+
 	const token = useToken()
-
-	const [isLoading, setIsLoading] = useState(false)
-
 	const [captchaValue, setCaptchaValue] = useState<string | null>(null)
 
-	return <></>
+	const queryClient = useQueryClient()
+	const mutation = useMutation({
+		onMutate: () => {
+			toaster.info({ title: "Добавление комментария...", duration: import.meta.env.VITE_TOAST_DURATION })
+		},
+		mutationFn: (request: any) => {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/comments?chapter_id=${chapterData?.id}`, {
+				method: "POST",
+				body: JSON.stringify(request),
+				headers: {
+					"Content-Type": "application/json",
+					Captcha: captchaValue ?? "",
+					Token: token ?? "",
+				},
+			}).then((res) => handleResponse(res))
+		},
+		onSuccess: (result: any) => {
+			toaster.success({ title: "Комментарий добавлен", duration: import.meta.env.VITE_TOAST_DURATION })
 
-	// const queryClient = useQueryClient()
-	// const mutation = useMutation({
-	// 	onMutate: () => {
-	// 		setIsLoading(true)
-	// 	},
-	// 	mutationFn: (request: any) => {
-	// 		toaster.info({ title: "Добавление комментария...", duration: import.meta.env.VITE_TOAST_DURATION })
-	// 		return fetch(`${import.meta.env.VITE_BASE_URL}/comments?book_id=${bookid}&chapter_index=${chapter_index}`, {
-	// 			method: "POST",
-	// 			body: JSON.stringify(request),
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 				Captcha: captchaValue ?? "",
-	// 				Token: token ?? "",
-	// 			},
-	// 		}).then((res) => handleResponse(res))
-	// 	},
-	// 	onSuccess: (result: any) => {
-	// 		toaster.success({ title: "Комментарий добавлен", duration: import.meta.env.VITE_TOAST_DURATION })
-	// 		queryClient.setQueryData(["comment_list", bookid, chapter_index], (data: any) => [...data, result])
-	// 	},
-	// 	onError: (error) => {
-	// 		toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
-	// 	},
-	// 	onSettled: () => {
-	// 		setIsLoading(false)
-	// 		setCaptchaValue(null)
-	// 	},
-	// })
+			let previous = new CommentPublic(result)
 
-	// const onSubmit = (request: CommentCreateRequest) => {
-	// 	mutation.mutate(request)
-	// }
+			queryClient.setQueriesData<CommentPublic[]>(
+				{ queryKey: ["book_show", "chapter_show", "comments"], exact: false },
+				(data) => {
+					if(!data) return undefined
 
-	// const {
-	// 	register,
-	// 	handleSubmit,
-	// 	formState: { errors },
-	// } = useForm<CommentCreateRequest>()
+					const last = data[data.length-1]
 
-	// return (
-	// 	<Stack gap={4} asChild>
-	// 		<form onSubmit={handleSubmit(onSubmit)}>
-	// 			<Field.Root disabled={isLoading} required invalid={!!errors.user}>
-	// 				<Input {...register("user")} placeholder={"Имя"} />
-	// 				<Field.ErrorText> {errors.user} </Field.ErrorText>
-	// 			</Field.Root>
+					const updated = [previous, ...data.slice(0, -1)]
+					previous = last
 
-	// 			<Field.Root disabled={isLoading} required invalid={!!errors.content}>
-	// 				<Textarea {...register("content")} placeholder={"Напишите свой комментарий"} minH={32} autoresize />
-	// 				<Field.ErrorText> {errors.content} </Field.ErrorText>
-	// 			</Field.Root>
+					return updated
+				}
+			)
 
-	// 			{!captchaValue && !token && !isLoading ? (
-	// 				<ReCAPTCHA onChange={(value) => setCaptchaValue(value)} sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY} />
-	// 			) : (
-	// 				<Button loading={isLoading} type="submit" alignSelf={"start"} colorPalette={"teal"}>
-	// 					Отправить
-	// 				</Button>
-	// 			)}
-	// 		</form>
-	// 	</Stack>
-	// )
+			// queryClient.refetchQueries({ queryKey: ["book_show", "chapter_show", "comments"], exact: false })
+		}
+	})
+
+	const onSubmit = (request: CommentCreateRequest) => {
+		mutation.mutate(request)
+	}
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<CommentCreateRequest>()
+
+	return (
+		<Stack gap={4} pb={8} asChild>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<Field.Root disabled={mutation.isPending} required invalid={!!errors.user}>
+					<Input {...register("user")} placeholder={"Имя"} />
+					<Field.ErrorText> {errors.user} </Field.ErrorText>
+				</Field.Root>
+
+				<Field.Root disabled={mutation.isPending} required invalid={!!errors.content}>
+					<Textarea {...register("content")} placeholder={"Напишите свой комментарий"} minH={32} autoresize />
+					<Field.ErrorText> {errors.content} </Field.ErrorText>
+				</Field.Root>
+
+				<Wrap justifyContent="space-between">
+					{!token && <ReCAPTCHA onChange={(value) => setCaptchaValue(value)} sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY} />}
+
+					<Button disabled={!captchaValue && !token} loading={mutation.isPending} type="submit" variant="outline">
+						Отправить
+					</Button>
+				</Wrap>
+			</form>
+		</Stack>
+	)
 }

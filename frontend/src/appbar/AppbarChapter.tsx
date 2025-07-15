@@ -3,20 +3,18 @@ import { ChapterDeleteDialogue } from "@/chapter/ChapterDeleteDialogue"
 import { CommentListDialogue } from "@/comment/CommentListDialogue"
 import { AdaptiveButton } from "@/components/AdaptiveButton"
 import { ArrowSelect } from "@/components/ArrowSelect"
-import { Title } from "@/components/Title"
 import { ColorModeButton } from "@/components/ui/color-mode"
 import { useCurrentChapterQuery, useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { useClearQueries } from "@/hooks/useClearQueries"
 import { useNavigateChapter } from "@/hooks/useNavigateChapter"
 import { useObserver } from "@/hooks/useObserver"
 import { useToken } from "@/hooks/useToken"
-import { ChapterReference, isSameChapter } from "@/types"
+import { isSameChapter } from "@/types"
 import { IconButton, Menu, Skeleton } from "@chakra-ui/react"
-import { useQueryClient } from "@tanstack/react-query"
 import { useClickAway } from "@uidotdev/usehooks"
 import { useState } from "preact/hooks"
 import { LuArrowLeft, LuEllipsisVertical, LuMessageSquare } from "react-icons/lu"
-import { useLocation, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 
 const ChapterActions = () => {
 	const [open, setOpen] = useState(false)
@@ -93,13 +91,13 @@ export const AppbarChapter = () => {
 			<Skeleton maxW={64} flexGrow={1}>...</Skeleton>
 		}
 
-		{/* <CommentListDialogue
+		<CommentListDialogue
 			triggerButton={<AdaptiveButton ml="auto" disabled={!chapterData} label="Комментарии" icon={<LuMessageSquare />} size="sm" variant="ghost" />}
-		/> */}
+		/>
 
-		<ColorModeButton ml="auto" />
+		<ColorModeButton />
 
-		<ChapterActions />
+		{token && <ChapterActions />}
 
 	</Appbar>
 }

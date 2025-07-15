@@ -29,9 +29,9 @@ const BookEntry = ({ data }: BookEntryProps) => {
 	return (
 		<Wrapper>
 			<Image rounded="sm" w={"100%"} aspectRatio={0.65} objectFit="cover" src={`${import.meta.env.VITE_BASE_URL}/covers/${data.cover_path}`} />
-			<Box display={"inline-flex"} fontSize="sm" mt={2} fontWeight={"bold"}>
+			<Box fontSize="sm" mt={2} fontWeight={"bold"}>
 				{data.title}
-				{isBookmarked && (<Icon ml={1} mt={1} alignSelf={"center"}><LuBookmark /></Icon>)}
+				{isBookmarked && (<Icon ml={2}><LuBookmark /></Icon>)}
 			</Box>
 			<Box fontSize="xs" color="GrayText"> {data.title_original} </Box>
 		</Wrapper>

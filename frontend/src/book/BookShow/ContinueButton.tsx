@@ -16,16 +16,16 @@ const ContinueButtonMenu = chakra(({ activeBookmark, passiveBookmark, open, setO
         <Menu.Content ref={ref} {...other}>
 
             <Menu.Item value="menu" asChild>
-                <Link to={generatePath(activeBookmark)}>
+                <Link to={generatePath(passiveBookmark)}>
                     <LuBookmark />
-                    {activeBookmark.getRepr()}
+                    {passiveBookmark.getRepr()}
                 </Link>
             </Menu.Item>
 
             <Menu.Item value="lol" asChild>
-                <Link to={generatePath(passiveBookmark)}>
+                <Link to={generatePath(activeBookmark)}>
                     <Icon color="red.400"><LuBookmark /></Icon>
-                    {passiveBookmark.getRepr()}
+                    {activeBookmark.getRepr()}
                 </Link>
             </Menu.Item>
 
@@ -57,13 +57,15 @@ export const ContinueButton = () => {
             <Link to={generatePath(latestChapter!)}>
                 <LuBookOpen />
 
-                <Box display={"none"} md={{ display: "block" }}>
+                <Box>
                     Продолжить
                     <chakra.span ml={1} fontSize="x-small" fontFamily="mono" verticalAlign="baseline">{latestChapter?.getRepr()}</chakra.span>
                 </Box>
+
+                {/* display={"none"} md={{ display: "block" }}
                 <Box md={{ display: "none" }}>
                     {latestChapter?.getRepr()}
-                </Box>
+                </Box> */}
             </Link>
         </Button>
 

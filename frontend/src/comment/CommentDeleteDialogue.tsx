@@ -13,30 +13,33 @@ type CommentDeleteDialogueProps = {
 	children: any
 }
 export const CommentDeleteDialogue = ({ commentId, children }: CommentDeleteDialogueProps) => {
-	return <></>
-	
-	// const token = useToken()
+	const token = useToken()
 	// const { bookId, chapterIndex } = useCurrentParams()
 
-	// const queryClient = useQueryClient()
-	// const mutation = useMutation({
-	// 	onMutate: () => {
-	// 		toaster.info({ title: "Удаление комментария...", duration: import.meta.env.VITE_TOAST_DURATION })
-	// 	},
-	// 	mutationFn: () => {
-	// 		return fetch(`${import.meta.env.VITE_BASE_URL}/comments/${commentId}`, {
-	// 			method: "DELETE",
-	// 			headers: { Token: token ?? "" }
-	// 		}).then((res) => handleResponse(res))
-	// 	},
-	// 	onSuccess: (result) => {
-	// 		toaster.success({ title: "Комментарий удален", duration: import.meta.env.VITE_TOAST_DURATION })
-	// 		queryClient.setQueryData(["comment_list", bookId, chapterIndex], (data: CommentPublic[]) => data.filter((entry) => entry.id !== result.id))
-	// 	},
-	// 	onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
-	// })
+	const queryClient = useQueryClient()
+	const mutation = useMutation({
+		onMutate: () => {
+			toaster.info({ title: "Удаление комментария...", duration: import.meta.env.VITE_TOAST_DURATION })
+		},
+		mutationFn: () => {
+			return fetch(`${import.meta.env.VITE_BASE_URL}/comments/${commentId}`, {
+				method: "DELETE",
+				headers: { Token: token ?? "" }
+			}).then((res) => handleResponse(res))
+		},
+		onSuccess: () => {
+			toaster.success({ title: "Комментарий удален", duration: import.meta.env.VITE_TOAST_DURATION })
 
-	// return (
-	// 	<ActionDialogue title="Удаление комментария" description="Вы действительно хотите удалить этот Комментарий?" promise={() => mutation.mutateAsync()}>{children}</ActionDialogue>
-	// )
+			queryClient.setQueriesData<CommentPublic[]>(
+				{ queryKey: ["book_show", "chapter_show", "comments"], exact: false },
+				(data) => data?.filter(comment => comment.id !== commentId)
+			)
+			queryClient.refetchQueries({ queryKey: ["book_show", "chapter_show", "comments"], exact: false })
+		},
+		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
+	})
+
+	return (
+		<ActionDialogue title="Удаление комментария" description="Вы действительно хотите удалить этот комментарий?" promise={() => mutation.mutateAsync()}>{children}</ActionDialogue>
+	)
 }

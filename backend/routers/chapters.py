@@ -151,11 +151,6 @@ def reorder(
     return {"from": from_chapters, "to": to_chapters}
 
 
-@router.get("", response_model=list[ChapterOverview])
-def list(book_id: str, session: Session = Depends(get_session)):
-    return None
-
-
 @router.get("/{id}", response_model=ChapterPublic)
 def show(id: int, session: Session = Depends(get_session)):
     chapter: Optional[Chapter] = crud.get_one(session, Chapter, id)

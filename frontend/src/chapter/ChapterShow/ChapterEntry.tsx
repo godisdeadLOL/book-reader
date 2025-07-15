@@ -5,7 +5,7 @@ import { useChapterQuery, useCurrentParams } from "@/hooks/queries"
 import { Prose } from "@/components/ui/prose"
 import { indexParagraphs } from "@/unistPlugins"
 import { checkEqualShallow, fixDirectSpeech } from "@/utils"
-import { Box, Heading, SystemStyleObject } from "@chakra-ui/react"
+import { Box, Heading, Icon, SystemStyleObject } from "@chakra-ui/react"
 import Markdown from "react-markdown"
 import { ChapterReference } from "@/types"
 
@@ -14,7 +14,7 @@ import { useBookmarkData } from "@/hooks/useBookmark"
 import { LuBookmark } from "react-icons/lu"
 import { ChapterEntryContext } from "./types"
 
-const style : SystemStyleObject = {
+const style: SystemStyleObject = {
     "& p": {
         mx: -4,
         px: 4,
@@ -59,10 +59,10 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
             p: ({ node, ...other }: any) => <Paragraph index={node.properties!.index} context={chapterContext} {...other} />
         }
 
-        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh"> 
-            <Heading display="flex" alignItems="center" gap={1}>
+        return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh">
+            <Heading>
                 {chapterData.getChapterReference().getRepr()} - {chapterData.title}
-                {(checkEqualShallow(chapterReference, passiveBookmark)) && <LuBookmark />}
+                {(checkEqualShallow(chapterReference, passiveBookmark)) && <Icon ml={2}><LuBookmark /></Icon>}
             </Heading>
 
             <Prose maxW={"full"} mt={8} textIndent={5} fontSize="md" css={style}>

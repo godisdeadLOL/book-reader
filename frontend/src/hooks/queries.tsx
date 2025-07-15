@@ -81,12 +81,12 @@ export const useCurrentChapterQuery = (enabled: boolean = true) => {
 	return useChapterQuery(chapterReference, enabled)
 }
 
-export const useCurrentCommentsQuery = () => {
-	const { bookId: book_id } = useCurrentParams()
-
+export const useCommentsQuery = (chapterId: number, page: number) => {
 	return useQuery<CommentPublic[]>({
-		queryKey: ["comment_list", book_id],
-		// queryFn: () => fetch(`${import.meta.env.VITE_BASE_URL}/comments?book_id=${book_id}&chapter_index=${chapter_index}`).then((res) => handleResponse(res)),
+		queryKey: ["book_show", "chapter_show", "comments", page],
+		queryFn: () => fetch(`${import.meta.env.VITE_BASE_URL}/comments?chapter_id=${chapterId}&page=${page}`)
+			.then((res) => handleResponse(res))
+			.then((json: any[]) => json.map(entry => new CommentPublic(entry)))
 	})
 }
 
