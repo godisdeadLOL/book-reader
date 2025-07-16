@@ -5,7 +5,7 @@ import { isSameChapter } from "@/types"
 import { chakra, Menu, Icon, ButtonGroup, Button, Box, IconButton } from "@chakra-ui/react"
 import { useClickAway } from "@uidotdev/usehooks"
 import { useState } from "preact/hooks"
-import { LuBookmark, LuBookOpen, LuChevronDown } from "react-icons/lu"
+import { LuBookmark, LuBookOpen, LuChevronDown, LuEye } from "react-icons/lu"
 import { Link, useNavigate } from "react-router"
 
 const ContinueButtonMenu = chakra(({ activeBookmark, passiveBookmark, open, setOpen, ...other }: any) => {
@@ -17,7 +17,7 @@ const ContinueButtonMenu = chakra(({ activeBookmark, passiveBookmark, open, setO
 
             <Menu.Item value="menu" asChild>
                 <Link to={generatePath(passiveBookmark)}>
-                    <LuBookmark />
+                    <Icon color="red.400"><LuEye /></Icon>
                     {passiveBookmark.getRepr()}
                 </Link>
             </Menu.Item>

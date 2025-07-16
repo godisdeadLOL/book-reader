@@ -5,7 +5,7 @@ import { ChapterPreview } from "@/schemas"
 import { attr } from "@/utuils/attr"
 import { useState } from "preact/hooks"
 import { Link } from "react-router"
-import { LuBookmark, LuEllipsis, LuEllipsisVertical } from "react-icons/lu"
+import { LuBookmark, LuEllipsis, LuEllipsisVertical, LuEye } from "react-icons/lu"
 import { Icon } from "@chakra-ui/react"
 import { ChapterReference, isSameChapter, isSameParagraph } from "@/types"
 import { useNavigateChapter } from "@/hooks/useNavigateChapter"
@@ -42,7 +42,10 @@ export const ChapterEntry = ({ chapterData, context, style }: ChapterEntryProps)
                 <span> - {chapterData.title}</span>
             </Link>
 
-            {isBookmarked && <Icon color={IsActiveBookmarked ? "red.500" : "inherit"}><LuBookmark /></Icon>}
+            {isBookmarked && (IsActiveBookmarked ?
+                <Icon color="red.500"><LuBookmark /></Icon> :
+                <Icon><LuEye /></Icon>
+            )}
 
             <time>12.08.2025</time>
 

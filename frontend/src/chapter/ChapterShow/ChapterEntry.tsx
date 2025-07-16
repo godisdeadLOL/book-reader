@@ -11,7 +11,7 @@ import { ChapterReference } from "@/types"
 
 import { Paragraph } from "./Paragraph"
 import { useBookmarkData } from "@/hooks/useBookmark"
-import { LuBookmark } from "react-icons/lu"
+import { LuBookmark, LuEye } from "react-icons/lu"
 import { ChapterEntryContext } from "./types"
 
 const style: SystemStyleObject = {
@@ -62,7 +62,7 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
         return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh">
             <Heading>
                 {chapterData.getChapterReference().getRepr()} - {chapterData.title}
-                {(checkEqualShallow(chapterReference, passiveBookmark)) && <Icon ml={2}><LuBookmark /></Icon>}
+                {(checkEqualShallow(chapterReference, passiveBookmark)) && <Icon ml={2}><LuEye /></Icon>}
             </Heading>
 
             <Prose maxW={"full"} mt={8} textIndent={5} fontSize="md" css={style}>
