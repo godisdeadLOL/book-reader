@@ -43,8 +43,6 @@ export const CommentList = () => {
 
 	}, [state])
 
-	if (state === "finished" && pageCount === 1) return <CommentListFallback />
-
 	return (
 		<Wrapper>
 			{chapterData && Array(pageCount).fill(undefined).map((_, index) =>
@@ -56,6 +54,7 @@ export const CommentList = () => {
 
 			{state === "loading" && (pageCount === 1 ? <CommentBlockSkeleton /> : <CommentBlockLoading />)}
 			{state === "await" && <CommentBlockLoading ref={blockLoading} />}
+			{state === "finished" && pageCount === 1 && <CommentListFallback />}
 
 		</Wrapper>
 	)
