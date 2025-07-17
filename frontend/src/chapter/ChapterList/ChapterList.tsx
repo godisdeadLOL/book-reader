@@ -5,7 +5,7 @@ import { ChapterInteraction, ChapterListContext, ChapterReorderRequest } from ".
 import { useCurrentChaptersQuery, useCurrentParams } from "@/hooks/queries"
 import { Box, SystemStyleObject } from "@chakra-ui/react"
 import { useWindowVirtualizer } from "@tanstack/react-virtual"
-import { useRef, useState } from "preact/hooks"
+import { useEffect, useRef, useState } from "preact/hooks"
 import { ChapterDeleteDialogue } from "@/chapter/ChapterDeleteDialogue"
 
 import { ReorderPopup } from "./ReorderPopup"
@@ -97,7 +97,6 @@ const style: SystemStyleObject = {
     }
 }
 export const ChapterList = ({ reverse }: { reverse: boolean }) => {
-    // todo: пофиксить лишние перерисовки
     const { data: chaptersData } = useCurrentChaptersQuery()
     if (!chaptersData) return <ChapterListSkeleton />
 
@@ -130,7 +129,7 @@ export const ChapterList = ({ reverse }: { reverse: boolean }) => {
 
         onChapterClick(chapterData, direction) {
             if (interaction?.mode !== "reorder") return
-            if (interaction.chapterData === chapterData) return
+            if (interaction.chapterData.id === chapterData.id) return
 
             const reorderRequest: ChapterReorderRequest = {
                 chapterId: interaction.chapterData.id,
@@ -153,7 +152,7 @@ export const ChapterList = ({ reverse }: { reverse: boolean }) => {
             setOpen={(open) => { if (!open) setInteraction(undefined) }}
         />
 
-        <ChapterVirtualList chaptersData={chaptersData} context={context} />
+        <ChapterVirtualList chaptersData={chapters} context={context} />
     </>
 }
 
@@ -163,14 +162,14 @@ type ChapterVirtualListProps = {
     context: ChapterListContext
 }
 const ChapterVirtualList = ({ chaptersData, context }: ChapterVirtualListProps) => {
-    console.log("virtual list rerender:", chaptersData)
-
     const listRef = useRef<HTMLDivElement | null>(null)
     const virtualizer = useWindowVirtualizer({
         count: chaptersData.length,
         estimateSize: () => 40,
         overscan: 5,
-        scrollMargin: listRef.current ? (listRef.current.getBoundingClientRect().top + window.scrollY) : 0
+        scrollMargin: listRef.current ? (listRef.current.getBoundingClientRect().top + window.scrollY) : 0,
+        getItemKey: (index) => chaptersData[index].id,
+
     })
 
     context.isScrolling = virtualizer.isScrolling
@@ -179,7 +178,7 @@ const ChapterVirtualList = ({ chaptersData, context }: ChapterVirtualListProps) 
         <div ref={listRef} style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
             {virtualizer.getVirtualItems().map((item) =>
                 <ChapterEntry
-                    key={chaptersData[item.index].id}
+                    key={item.key}
                     style={{ position: "absolute", top: 0, left: 0, width: "100%", height: item.size, transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)` }}
                     chapterData={chaptersData[item.index]}
                     context={context}

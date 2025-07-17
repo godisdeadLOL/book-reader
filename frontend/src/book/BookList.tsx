@@ -1,4 +1,4 @@
-import { Box, For, Icon, Image, Skeleton, Wrap } from "@chakra-ui/react"
+import { Box, chakra, For, Icon, Image, Skeleton, Wrap } from "@chakra-ui/react"
 import { useNavigate } from "react-router"
 import { useBooksQuery } from "@/hooks/queries"
 import { BookPreview } from "@/schemas"
@@ -30,8 +30,8 @@ const BookEntry = ({ data }: BookEntryProps) => {
 		<Wrapper>
 			<Image rounded="sm" w={"100%"} aspectRatio={0.65} objectFit="cover" src={`${import.meta.env.VITE_BASE_URL}/covers/${data.cover_path}`} />
 			<Box fontSize="sm" mt={2} fontWeight={"bold"}>
-				{data.title}
-				{isBookmarked && (<Icon ml={2}><LuBookmark /></Icon>)}
+				<chakra.span mr={2}>{data.title}</chakra.span>
+				{isBookmarked && (<Icon><LuBookmark /></Icon>)}
 			</Box>
 			<Box fontSize="xs" color="GrayText"> {data.title_original} </Box>
 		</Wrapper>

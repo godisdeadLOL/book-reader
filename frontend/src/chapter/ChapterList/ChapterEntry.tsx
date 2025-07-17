@@ -30,12 +30,7 @@ export const ChapterEntry = ({ chapterData, context, style }: ChapterEntryProps)
     const isBookmarked = isPassiveBookmarked || IsActiveBookmarked
 
     const { generatePath } = useNavigateChapter()
-
-    if(chapterData.index < 3 && chapterData.volume === 1)
-    {
-        console.log(chapterData.id, chapterData.index)
-    }
-
+    
     return (
         <div
             {...attr(elevate, "data-elevate")}

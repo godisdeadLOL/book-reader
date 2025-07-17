@@ -23,23 +23,23 @@ const extractChapterSequence = (chaptersData: ChapterPreview[]) => {
 }
 
 const reorderChapters = (chaptersData: ChapterPreview[], request: ChapterReorderRequest) => {
-    chaptersData = [...chaptersData]
+    const chapters = chaptersData.map(chapter => new ChapterPreview(chapter))
 
-    const currentChapter = chaptersData.find(chapter => chapter.id === request.chapterId)!
+    const currentChapter = chapters.find(chapter => chapter.id === request.chapterId)!
 
     if (request.volume === currentChapter.volume && request.index > currentChapter.index)
         request.index--
 
     // сдвиг глав после начаольной позиции
     const from_chapters = extractChapterSequence(
-        chaptersData.filter(chapter => (chapter.index > currentChapter.index && chapter.volume === currentChapter.volume))
+        chapters.filter(chapter => (chapter.index > currentChapter.index && chapter.volume === currentChapter.volume))
     )
     if (from_chapters.length > 0 && from_chapters[0].index === currentChapter.index + 1)
         from_chapters.forEach(chapter => chapter.index -= 1)
 
     // сдвиг глав вверх после целевой позиции
     const to_chapters = extractChapterSequence(
-        chaptersData.filter(chapter => (chapter.index >= request.index && chapter.volume === request.volume))
+        chapters.filter(chapter => (chapter.index >= request.index && chapter.volume === request.volume))
     )
     if (to_chapters.length > 0 && to_chapters[0].index === request.index)
         to_chapters.forEach(chapter => chapter.index += 1)
@@ -48,24 +48,27 @@ const reorderChapters = (chaptersData: ChapterPreview[], request: ChapterReorder
     currentChapter.index = request.index
     currentChapter.volume = request.volume
 
-    return chaptersData.sort(
+    const sorted = chapters.sort(
         (a, b) => (a.volume ?? 0) - (b.volume ?? 0) || a.index - b.index
     )
+
+    return sorted
 }
 
 export const useReorderMutation = () => {
-    const { bookId } = useCurrentParams()
     const token = useToken()
-
-    const { refetch } = useCurrentChaptersQuery()
 
     const queryClient = useQueryClient()
     const mutation = useMutation({
         onMutate: (variables: ChapterReorderRequest) => {
             toaster.info({ title: "Изменение порядка...", duration: import.meta.env.VITE_TOAST_DURATION })
+
             queryClient.setQueryData<ChapterPreview[]>(
                 ["book_show", "chapter_list"],
-                data => { return data ? reorderChapters(data, variables) : undefined }
+                data => {
+                    const updated = reorderChapters(data!, variables)
+                    return updated
+                }
             )
         },
         mutationFn: (request: ChapterReorderRequest) => {

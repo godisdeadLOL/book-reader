@@ -5,7 +5,7 @@ import { useChapterQuery, useCurrentParams } from "@/hooks/queries"
 import { Prose } from "@/components/ui/prose"
 import { indexParagraphs } from "@/unistPlugins"
 import { checkEqualShallow, fixDirectSpeech } from "@/utils"
-import { Box, Heading, Icon, SystemStyleObject } from "@chakra-ui/react"
+import { Box, chakra, Heading, Icon, SystemStyleObject } from "@chakra-ui/react"
 import Markdown from "react-markdown"
 import { ChapterReference } from "@/types"
 
@@ -61,8 +61,8 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
 
         return <Box id={`chapter-${chapterData.id}`} pb={8} minH="100dvh">
             <Heading>
-                {chapterData.getChapterReference().getRepr()} - {chapterData.title}
-                {(checkEqualShallow(chapterReference, passiveBookmark)) && <Icon ml={2}><LuEye /></Icon>}
+                <chakra.span mr={2}>{chapterData.getChapterReference().getRepr()} - {chapterData.title}</chakra.span>
+                {(checkEqualShallow(chapterReference, passiveBookmark)) && <Icon><LuEye /></Icon>}
             </Heading>
 
             <Prose maxW={"full"} mt={8} textIndent={5} fontSize="md" css={style}>
