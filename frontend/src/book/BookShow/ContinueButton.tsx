@@ -6,7 +6,7 @@ import { chakra, Menu, Icon, ButtonGroup, Button, Box, IconButton } from "@chakr
 import { useClickAway } from "@uidotdev/usehooks"
 import { useState } from "preact/hooks"
 import { LuBookmark, LuBookOpen, LuChevronDown, LuEye } from "react-icons/lu"
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 
 const ContinueButtonMenu = chakra(({ activeBookmark, passiveBookmark, open, setOpen, ...other }: any) => {
     const ref = useClickAway(() => setOpen?.(false))
@@ -15,14 +15,14 @@ const ContinueButtonMenu = chakra(({ activeBookmark, passiveBookmark, open, setO
     return <Menu.Root open={open}>
         <Menu.Content ref={ref} {...other}>
 
-            <Menu.Item value="menu" asChild>
+            <Menu.Item value="passive" asChild>
                 <Link to={generatePath(passiveBookmark)}>
-                    <Icon color="red.400"><LuEye /></Icon>
+                    <Icon><LuEye /></Icon>
                     {passiveBookmark.getRepr()}
                 </Link>
             </Menu.Item>
 
-            <Menu.Item value="lol" asChild>
+            <Menu.Item value="active" asChild>
                 <Link to={generatePath(activeBookmark)}>
                     <Icon color="red.400"><LuBookmark /></Icon>
                     {activeBookmark.getRepr()}

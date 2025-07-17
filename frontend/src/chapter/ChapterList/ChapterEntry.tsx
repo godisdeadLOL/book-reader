@@ -9,6 +9,7 @@ import { LuBookmark, LuEllipsis, LuEllipsisVertical, LuEye } from "react-icons/l
 import { Icon } from "@chakra-ui/react"
 import { ChapterReference, isSameChapter, isSameParagraph } from "@/types"
 import { useNavigateChapter } from "@/hooks/useNavigateChapter"
+import { formatTimestamp } from "@/utils"
 
 type ChapterEntryProps = {
     chapterData: ChapterPreview
@@ -30,6 +31,11 @@ export const ChapterEntry = ({ chapterData, context, style }: ChapterEntryProps)
 
     const { generatePath } = useNavigateChapter()
 
+    if(chapterData.index < 3 && chapterData.volume === 1)
+    {
+        console.log(chapterData.id, chapterData.index)
+    }
+
     return (
         <div
             {...attr(elevate, "data-elevate")}
@@ -47,7 +53,7 @@ export const ChapterEntry = ({ chapterData, context, style }: ChapterEntryProps)
                 <Icon><LuEye /></Icon>
             )}
 
-            <time>12.08.2025</time>
+            <time>{formatTimestamp(chapterData.created_at)}</time>
 
             {isAdmin && <>
                 {!isScrolling ?

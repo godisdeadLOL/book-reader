@@ -23,34 +23,34 @@ const extractChapterSequence = (chaptersData: ChapterPreview[]) => {
 }
 
 const reorderChapters = (chaptersData: ChapterPreview[], request: ChapterReorderRequest) => {
-    console.log(request)
-
     chaptersData = [...chaptersData]
 
     const currentChapter = chaptersData.find(chapter => chapter.id === request.chapterId)!
 
-    //
-    const to_chapters = extractChapterSequence(
-        chaptersData.filter(chapter => (chapter.index >= request.index && chapter.volume === request.volume))
-    )
-    if (to_chapters.length > 0 && to_chapters[0].index === request.index)
-        to_chapters.forEach(chapter => chapter.index += 1)
-    
-    //
+    if (request.volume === currentChapter.volume && request.index > currentChapter.index)
+        request.index--
+
+    // сдвиг глав после начаольной позиции
     const from_chapters = extractChapterSequence(
         chaptersData.filter(chapter => (chapter.index > currentChapter.index && chapter.volume === currentChapter.volume))
     )
     if (from_chapters.length > 0 && from_chapters[0].index === currentChapter.index + 1)
         from_chapters.forEach(chapter => chapter.index -= 1)
 
+    // сдвиг глав вверх после целевой позиции
+    const to_chapters = extractChapterSequence(
+        chaptersData.filter(chapter => (chapter.index >= request.index && chapter.volume === request.volume))
+    )
+    if (to_chapters.length > 0 && to_chapters[0].index === request.index)
+        to_chapters.forEach(chapter => chapter.index += 1)
+
+
     currentChapter.index = request.index
     currentChapter.volume = request.volume
 
-    chaptersData.sort(
-        (a, b) => (a.volume ?? 0) - (b.volume ?? 0) || a.index - b.index 
+    return chaptersData.sort(
+        (a, b) => (a.volume ?? 0) - (b.volume ?? 0) || a.index - b.index
     )
-
-    return chaptersData
 }
 
 export const useReorderMutation = () => {
@@ -69,8 +69,6 @@ export const useReorderMutation = () => {
             )
         },
         mutationFn: (request: ChapterReorderRequest) => {
-            // return undefined
-
             return fetch(`${import.meta.env.VITE_BASE_URL}/chapters/reorder/${request.chapterId}`, {
                 method: "POST",
                 body: JSON.stringify({ ...request, chapterId: undefined }),
@@ -81,8 +79,8 @@ export const useReorderMutation = () => {
             }).then((res) => handleResponse(res))
         },
         onSuccess: (_data) => {
-            toaster.success({ title: "Порядок изменен...", duration: import.meta.env.VITE_TOAST_DURATION })
-            refetch()
+            toaster.success({ title: "Порядок изменен", duration: import.meta.env.VITE_TOAST_DURATION })
+            // refetch()
         }
     })
 

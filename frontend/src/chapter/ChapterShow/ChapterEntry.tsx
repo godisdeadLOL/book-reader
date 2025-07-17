@@ -45,7 +45,7 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
 
     useEffect(() => {
         if (isCurrent) setPassiveBookmark(chapterReference)
-    }, [chapterData])
+    }, [chapterData, isCurrent])
 
     const rendered = useMemo(() => {
         const chapterContext: ChapterEntryContext = {

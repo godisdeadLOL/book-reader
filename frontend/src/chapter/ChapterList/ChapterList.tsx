@@ -89,7 +89,10 @@ const style: SystemStyleObject = {
         _hover: {
             borderBottomWidth: 2,
             borderColor: "blue.400",
-            // bg: "red"
+        },
+        _active: {
+            borderBottomWidth: 2,
+            borderColor: "blue.400",
         }
     }
 }
@@ -150,7 +153,7 @@ export const ChapterList = ({ reverse }: { reverse: boolean }) => {
             setOpen={(open) => { if (!open) setInteraction(undefined) }}
         />
 
-        <ChapterVirtualList chaptersData={chapters} context={context} />
+        <ChapterVirtualList chaptersData={chaptersData} context={context} />
     </>
 }
 
@@ -160,6 +163,7 @@ type ChapterVirtualListProps = {
     context: ChapterListContext
 }
 const ChapterVirtualList = ({ chaptersData, context }: ChapterVirtualListProps) => {
+    console.log("virtual list rerender:", chaptersData)
 
     const listRef = useRef<HTMLDivElement | null>(null)
     const virtualizer = useWindowVirtualizer({
@@ -175,7 +179,7 @@ const ChapterVirtualList = ({ chaptersData, context }: ChapterVirtualListProps) 
         <div ref={listRef} style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
             {virtualizer.getVirtualItems().map((item) =>
                 <ChapterEntry
-                    key={item.index}
+                    key={chaptersData[item.index].id}
                     style={{ position: "absolute", top: 0, left: 0, width: "100%", height: item.size, transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)` }}
                     chapterData={chaptersData[item.index]}
                     context={context}

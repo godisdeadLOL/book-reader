@@ -15,12 +15,8 @@ router = APIRouter()
 
 
 @router.get("/query/", response_model=ChapterPublic)
-def query_one(
-    book_id: str, index: int, volume: Optional[int] = None, session: Session = Depends(get_session)
-):
-    entry: Optional[Chapter] = crud.query_one(
-        session, Chapter, and_(Chapter.book_id == book_id, Chapter.volume == volume, Chapter.index == index)
-    )
+def query_one(book_id: str, index: int, volume: Optional[int] = None, session: Session = Depends(get_session)):
+    entry: Optional[Chapter] = crud.query_one(session, Chapter, and_(Chapter.book_id == book_id, Chapter.volume == volume, Chapter.index == index))
 
     if not entry:
         raise HTTPException(404)
@@ -72,9 +68,7 @@ def create(
 
     # Определить номер главы если он не указан
     if create_request.index is None:
-        stmt = select(func.max(Chapter.index)).where(
-            and_(Chapter.book_id == book_id, Chapter.volume == create_request.volume)
-        )
+        stmt = select(func.max(Chapter.index)).where(and_(Chapter.book_id == book_id, Chapter.volume == create_request.volume))
 
         last_index = session.scalar(stmt)
         create_request.index = (last_index + 1) if last_index is not None else 1
@@ -103,24 +97,8 @@ def reorder(
     session.execute(select(Chapter).where(Chapter.book_id == current_chapter.book_id).with_for_update())
     session.refresh(current_chapter)
 
-    # Сдвинуть главы после целевой главы
-    to_chapters: List[Chapter] = crud.query_many(
-        session,
-        Chapter,
-        and_(
-            Chapter.book_id == current_chapter.book_id,
-            Chapter.volume == reorder_request.volume,
-            Chapter.index >= reorder_request.index,
-        ),
-        Chapter.index,
-    )
-    to_chapters = get_chapter_sequence(to_chapters)
-
-    if len(to_chapters) > 0 and to_chapters[0].index == reorder_request.index:
-        for chapter in to_chapters:
-            chapter.index += 1
-
-    session.add_all(to_chapters)
+    if reorder_request.volume == current_chapter.volume and reorder_request.index > current_chapter.index:
+        reorder_request.index -= 1
 
     # Сдвинуть главы после текущей главы
     from_chapters: List[Chapter] = crud.query_many(
@@ -140,6 +118,25 @@ def reorder(
             chapter.index -= 1
 
     session.add_all(from_chapters)
+
+    # Сдвинуть главы после целевой главы
+    to_chapters: List[Chapter] = crud.query_many(
+        session,
+        Chapter,
+        and_(
+            Chapter.book_id == current_chapter.book_id,
+            Chapter.volume == reorder_request.volume,
+            Chapter.index >= reorder_request.index,
+        ),
+        Chapter.index,
+    )
+    to_chapters = get_chapter_sequence(to_chapters)
+
+    if len(to_chapters) > 0 and to_chapters[0].index == reorder_request.index:
+        for chapter in to_chapters:
+            chapter.index += 1
+
+    session.add_all(to_chapters)
 
     # Изменить номер текущей главы
     current_chapter.index = reorder_request.index
