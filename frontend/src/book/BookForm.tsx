@@ -1,9 +1,8 @@
 import { ImageUpload } from "@/components/ImageUpload"
 import { BookPublic } from "@/schemas"
 import { Stack, Field, Input, Textarea, Button } from "@chakra-ui/react"
-import { useEffect, useState } from "preact/hooks"
+import { useEffect } from "preact/hooks"
 import { useForm } from "react-hook-form"
-import { LuPen } from "react-icons/lu"
 
 export type BookFormFields = {
     id: string
@@ -22,7 +21,7 @@ type BookFormProps = {
 
     onSubmit: (request: BookFormFields) => void
 
-    children : any
+    children: any
 }
 export const BookForm = ({ onSubmit, bookData = undefined, disabled = false, loading = false, required = false, children }: BookFormProps) => {
     const {
@@ -47,7 +46,7 @@ export const BookForm = ({ onSubmit, bookData = undefined, disabled = false, loa
     }, [bookData])
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} onError={() => alert(15)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={4}>
                 <Field.Root disabled={disabled} required={required} invalid={!!errors.id}>
                     <Field.Label>ID Книги</Field.Label>

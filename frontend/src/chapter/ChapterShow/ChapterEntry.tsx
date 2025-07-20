@@ -21,7 +21,7 @@ const style: SystemStyleObject = {
         py: 2,
         md: { rounded: "md" },
         _selected: { bg: "bg.emphasized" },
-        overflowAnchor: "none"
+        // overflowAnchor: "none" - а на хроме без этого прыгает установка закладки
     }
 }
 
@@ -30,9 +30,10 @@ type ChapterEntryProps = {
 
     isCurrent?: boolean
     onChapterLoaded?: (chapterReference: ChapterReference) => void
+    onChapterError?: () => void
 }
-export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoaded = undefined }: ChapterEntryProps) => {
-    const { data: chapterData } = useChapterQuery(chapterReference)
+export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoaded = undefined, onChapterError = undefined }: ChapterEntryProps) => {
+    const { data: chapterData, isError } = useChapterQuery(chapterReference)
 
     useEffect(() => {
         if (chapterData) onChapterLoaded?.(chapterReference)
@@ -46,6 +47,10 @@ export const ChapterEntry = ({ chapterReference, isCurrent = false, onChapterLoa
     useEffect(() => {
         if (isCurrent) setPassiveBookmark(chapterReference)
     }, [chapterData, isCurrent])
+
+    useEffect(() => {
+        if (isError) onChapterError?.()
+    }, [isError])
 
     const rendered = useMemo(() => {
         const chapterContext: ChapterEntryContext = {

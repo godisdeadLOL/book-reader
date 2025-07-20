@@ -1,3 +1,6 @@
+import { toaster } from "@/components/ui/toaster"
+import { QueryError } from "@/hooks/queries"
+
 export const clampText = (text: string, maxSize: number) => {
 	if (text.length > maxSize) return text.substring(0, maxSize) + "..."
 	else return text
@@ -5,7 +8,13 @@ export const clampText = (text: string, maxSize: number) => {
 
 export const handleResponse = (response: Response) => {
 	if (response.ok) return response.json()
-	else return Promise.reject(new Error(`${response.status}: ${response.statusText}`))
+
+	const errorMessage = `${response.status}: ${response.statusText}`
+	toaster.error({ title: "Ошибка", description: errorMessage, duration: import.meta.env.VITE_TOAST_DURATION })
+
+	const error = new QueryError({ status: response.status }, errorMessage)
+
+	return Promise.reject(error)
 }
 
 const getLastDigit = (num: number) => num % 10

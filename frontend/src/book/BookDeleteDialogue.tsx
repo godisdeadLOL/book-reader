@@ -25,8 +25,7 @@ export const BookDeleteDialogue = ({children} : any) => {
 		onSuccess: () => {
 			toaster.success({ title: "Книга удалена", duration: import.meta.env.VITE_TOAST_DURATION })
 			navigate("/")
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
+		}
 	})
 
 	return (

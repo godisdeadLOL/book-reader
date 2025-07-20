@@ -33,8 +33,7 @@ export const BookCreate = () => {
 		onSuccess: (result: any) => {
 			toaster.success({ title: "Книга создана", duration: import.meta.env.VITE_TOAST_DURATION })
 			navigate(`/${result.id}`)
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
+		}
 	})
 
 	return <BookForm onSubmit={request => mutation.mutate(request)} loading={mutation.isPending} required>

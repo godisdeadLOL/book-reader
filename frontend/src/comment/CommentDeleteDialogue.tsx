@@ -35,8 +35,7 @@ export const CommentDeleteDialogue = ({ commentId, children }: CommentDeleteDial
 				(data) => data?.filter(comment => comment.id !== commentId)
 			)
 			queryClient.refetchQueries({ queryKey: ["book_show", "chapter_show", "comments"], exact: false })
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
+		}
 	})
 
 	return (

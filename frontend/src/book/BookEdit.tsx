@@ -42,8 +42,7 @@ export const BookEdit = () => {
 		onSuccess: (result: any) => {
 			toaster.success({ title: "Книга изменена", duration: import.meta.env.VITE_TOAST_DURATION })
 			navigate(`/${result.id}`)
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION })
+		}
 	})
 
 	return <BookForm onSubmit={request => mutation.mutate({ bookId: bookId!, request })} disabled={!bookData} loading={mutation.isPending} bookData={bookData}>

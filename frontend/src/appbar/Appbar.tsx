@@ -5,7 +5,7 @@ type AppbarProps = {
 	hideOnScroll?: boolean
 	children: any
 }
-export const Appbar = ({ hideOnScroll=false, children }: any) => {
+export const Appbar = ({ hideOnScroll=false, children }: AppbarProps) => {
 	const [hidden, setHidden] = useState(false)
 
 	const lastScroll = useRef(0)

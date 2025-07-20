@@ -13,17 +13,24 @@ export const ChapterShow = () => {
     const bookmarkApplied = useRef(false)
     const trackedChapterElement = useRef<HTMLElement | null>(null)
 
-    const { data: chaptersData } = useCurrentChaptersQuery()
+    const { data: chaptersData, isError } = useCurrentChaptersQuery()
+
+    const { navigate, navigateBack } = useNavigateChapter()
+
+    // Ошибка при загрузке глав
+    useEffect(() => {
+        if (isError) navigateBack()
+    }, [isError])
+
     if (!chaptersData) return <ChapterSkeleton />
 
     const { chapterReference } = useCurrentParams()
-    const { navigate } = useNavigateChapter()
-
     const [displayParams, setDisplayParams] = useState<{ current: number, next: boolean }>({
-        current: chaptersData.findIndex(entry =>
-            isSameChapter(entry.getReference(), chapterReference!)),
+        current: chaptersData.findIndex(entry => isSameChapter(entry.getReference(), chapterReference!)),
         next: false
     })
+
+    if (displayParams.current === -1) { navigateBack(); return null; }
 
     const chapterObserver = useObserver("chapter")
     useEffect(() => {
@@ -62,7 +69,7 @@ export const ChapterShow = () => {
             window.scrollTo(0, 0)
         } else {
             const topTarget = window.scrollY + element.getBoundingClientRect().top
-            window.scrollTo({ top: topTarget, behavior: "smooth" })
+            window.scrollTo({ top: topTarget })
         }
     }
 
@@ -110,7 +117,6 @@ export const ChapterShow = () => {
         return () => window.removeEventListener("scroll", onScroll)
     }, [displayParams, chaptersData, chapterReference])
 
-
     const displayedChapters = [
         chaptersData[displayParams.current],
         (displayParams.next && displayParams.current < chaptersData.length - 1) ? chaptersData[displayParams.current + 1] : null
@@ -120,6 +126,7 @@ export const ChapterShow = () => {
         {displayedChapters.map((chapter, index) =>
             <ChapterEntry
                 onChapterLoaded={index === 0 ? onCurrentChapterLoaded : undefined}
+                onChapterError={() => navigateBack()}
                 isCurrent={index === 0}
                 key={chapter.id}
                 chapterReference={chapter.getReference()}

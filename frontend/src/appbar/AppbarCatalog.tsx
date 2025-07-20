@@ -27,7 +27,7 @@ export const AppbarCatalog = ({ title }: any) => {
 			<LuArrowLeft />
 		</IconButton>}
 
-		<Title display={(bookId || mode) ? "none" : "block"} sm={{ display: "block" }}>{title}</Title>
+		<Title display={(bookId || mode) ? "none" : "block"} sm={{ display: "block" }}>{title ?? document.title}</Title>
 
 		<Box mx="auto" />
 

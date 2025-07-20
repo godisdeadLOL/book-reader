@@ -1,5 +1,5 @@
 import { ChapterPublic } from "@/schemas"
-import { Stack, Field, Input, Textarea, Button, NumberInput, InputGroup, CloseButton, IconButton } from "@chakra-ui/react"
+import { Stack, Field, Input, Textarea, Button, NumberInput, InputGroup, IconButton } from "@chakra-ui/react"
 import { forwardRef } from "preact/compat"
 import { useEffect, useRef, useState } from "preact/hooks"
 import { useForm } from "react-hook-form"

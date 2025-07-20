@@ -36,8 +36,7 @@ export const ChapterCreate = () => {
 			toaster.success({ title: "Глава создана", duration: import.meta.env.VITE_TOAST_DURATION })
 			clearChapterList()
 			navigate(new ChapterReference(chapter.volume, chapter.index))
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
+		}
 	})
 
 	return (

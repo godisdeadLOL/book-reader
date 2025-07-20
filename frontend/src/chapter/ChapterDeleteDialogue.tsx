@@ -41,8 +41,7 @@ export const ChapterDeleteDialogue = ({ chapterId = undefined, open = undefined,
 
 			queryClient.setQueryData(["book_show", "chapter_list"], (data: any) => data.filter((entry: any) => entry.id !== chapterId))
 			refetch()
-		},
-		onError: (error) => toaster.error({ title: error.message, duration: import.meta.env.VITE_TOAST_DURATION }),
+		}
 	})
 
 	return (

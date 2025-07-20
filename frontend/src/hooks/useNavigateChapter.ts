@@ -11,7 +11,7 @@ export const useNavigateChapter = () => {
         if (chapter.volume) path = `/${bookId}/${chapter.volume}/${chapter.index}`
         else path = `/${bookId}/${chapter.index}`
 
-        if(mode) path += `/${mode}`
+        if (mode) path += `/${mode}`
 
         return path
     }
@@ -21,5 +21,9 @@ export const useNavigateChapter = () => {
         navigate(generatePath(chapter, mode))
     }
 
-    return { generatePath, navigate: navigateChapter }
+    const navigateBack = () => {
+        navigate(`/${bookId}/`)
+    }
+
+    return { generatePath, navigate: navigateChapter, navigateBack }
 }

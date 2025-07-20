@@ -9,15 +9,25 @@ import { Header } from "./Header"
 import { Description } from "./Description"
 import { Tags } from "./Tags"
 import { Controls } from "./Controls"
+import { useNavigate } from "react-router"
 
 export const BookShow = () => {
-	const { data: bookData } = useCurrentBookQuery()
+	const { data: bookData, isError } = useCurrentBookQuery()
 	const { data: chaptersData } = useCurrentChaptersQuery()
 
 	const { clearChapterShow } = useClearQueries()
 	useEffect(() => {
 		clearChapterShow()
 	}, [])
+
+	useEffect(() => {
+		if (bookData) document.title = bookData?.title
+	}, [bookData])
+
+	const navigate = useNavigate()
+	useEffect(() => {
+		if (isError) navigate("/")
+	}, [isError])
 
 	const [reverse, setReverse] = useState(false)
 
