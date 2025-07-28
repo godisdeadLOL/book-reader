@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from typing import Optional
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class Base(BaseModel):
@@ -109,5 +109,5 @@ class CommentPublic(Base):
 
 
 class CommentCreate(Base):
-    user: str
-    content: str
+    user: str = Field(max_length=50)
+    content: str = Field(max_length=500)
